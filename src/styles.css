@@ -13,6 +13,10 @@
     background-color: #FAF6EE;
 }
 
+.theme-brown-medium {
+    background-color: #FCF4E4;
+}
+
 .theme-brown-dark {
     background-color: #E3DAC7ff;
 }
@@ -21,6 +25,14 @@
     background-color: #B9F1FF;
 }
 
+.theme-blue-light {
+    background-color: #EAF7FBff;
+}
+
 .bright-red {
     background-color: #FABAA5ff;
+}
+
+.theme-green {
+    background-color: #CCF4B3;
 }

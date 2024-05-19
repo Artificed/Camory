@@ -1,6 +1,6 @@
 import home_bg from './assets/home_bg.png'
-import Navbar from './components/navbar';
-import Button from './components/button';
+import Navbar from './components/Navbar';
+import Button from './components/Button';
 import { useNavigate } from "react-router-dom";
 
 function LandingPage() {

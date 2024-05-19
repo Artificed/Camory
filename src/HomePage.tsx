@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { invoke } from '@tauri-apps/api';
 import { useNavigate } from 'react-router-dom';
-import Navbar from './components/navbar';
-import Button from './components/button';
+import Navbar from './components/Navbar';
+import Button from './components/Button';
+import DeckDisplay from './components/DeckDisplay';
 
 interface Deck {
     id: string;
     name: string;
     user_id: string;
+    new_cards_per_day: number;
     cards: Card[];
 }
 
@@ -17,6 +19,7 @@ interface Card {
     status: string;
     ease: number;
     interval: number;
+    due_in: number; 
     fails: number;
     content?: CardContent;
 }
@@ -70,21 +73,27 @@ function HomePage() {
         fetchCurrentUser();
     }, [navigate]);
 
+    const handleCreateDeckClick = () => {
+        navigate("/create-deck")
+    }
+
     return (
         <div>
             <Navbar />
-            <div className="mt-16">
-                <form action="flex">
-                    <input type="text" name="" id="" className="theme-brown-light w-20 h-10"/>
-                    <Button text="Add Filter"/>
+            <div className="mt-16 flex flex-col items-center">
+                <form action="" className="flex justify-center w-5/6">
+                    <input type="text" name="" id="" className="theme-brown-medium rounded-lg w-2/3 h-12 mt-10 mr-3 p-3" placeholder="Enter Deck Name"/>
+                    <Button text="Search" className="p-3 bright-red w-24 mt-10 ml-3 text-sm border-none"/>
                 </form>
+                <div className="flex justify-start w-5/6 my-5" onClick={handleCreateDeckClick}>
+                    <Button text="+ Create Deck" className="w-36 h-8 text-xs theme-green"/>
+                </div>
                 {user ? (
-                    <div>
+                    <div className="w-5/6">
                         {decks.map((deck) => (
-                            <li key={deck.id}>
-                                <h2>{deck.name}</h2>
-                                <h4>{deck.cards.length}</h4>
-                            </li>
+                            <div key={deck.id}>
+                                <DeckDisplay deck={deck}/>
+                            </div>
                         ))}
                     </div>
                 ) : (

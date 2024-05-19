@@ -125,6 +125,7 @@ struct Deck {
     id: String,
     name: String,
     user_id: String,
+    new_cards_per_day: i16,
     cards: Vec<Card>,
 }
 
@@ -135,6 +136,7 @@ struct Card {
     status: String,
     ease: f32,
     interval: i16,
+    due_in: i16,
     fails: i16,
     content: Option<CardContent>,
 }
@@ -180,13 +182,21 @@ fn get_cards_for_deck(deck_id: String, mysql_pool: &State<Arc<Pool>>) -> Vec<Car
     let mut conn = mysql_pool.get_conn().expect("Failed to get connection");
 
     conn.exec_map(
-        "SELECT id, deck_id, status, ease, `interval`, fails
+        "SELECT id, deck_id, status, ease, `interval`, due_in, fails
          FROM cards
          WHERE deck_id = :deck_id",
         params! {
             "deck_id" => deck_id,
         },
-        |(id, deck_id, status, ease, interval, fails): (String, String, String, f64, i32, i32)| {
+        |(id, deck_id, status, ease, interval, due_in, fails): (
+            String,
+            String,
+            String,
+            f64,
+            i32,
+            i32,
+            i32,
+        )| {
             let content = get_card_content(id.clone(), mysql_pool);
             Card {
                 id,
@@ -194,6 +204,7 @@ fn get_cards_for_deck(deck_id: String, mysql_pool: &State<Arc<Pool>>) -> Vec<Car
                 status,
                 ease: ease as f32,
                 interval: interval as i16,
+                due_in: due_in as i16,
                 fails: fails as i16,
                 content,
             }
@@ -207,13 +218,13 @@ fn get_decks(user_id: String, mysql_pool: State<Arc<Pool>>) -> Vec<Deck> {
     let mut conn = mysql_pool.get_conn().expect("Failed to get connection");
     let decks: Vec<Deck> = conn
         .exec_map(
-            "SELECT id, user_id, name
+            "SELECT id, user_id, name, new_cards_per_day
              FROM decks
              WHERE user_id = :user_id",
             params! {
                 "user_id" => user_id,
             },
-            |(id, user_id, name): (String, String, String)| {
+            |(id, user_id, name, new_cards_per_day): (String, String, String, i16)| {
                 let id_clone = id.clone(); // Clone the id value
                 let cards = get_cards_for_deck(id_clone, &mysql_pool); // Fetch cards for the current deck
                 Deck {
@@ -221,11 +232,48 @@ fn get_decks(user_id: String, mysql_pool: State<Arc<Pool>>) -> Vec<Deck> {
                     user_id,
                     name,
                     cards,
+                    new_cards_per_day,
                 }
             },
         )
         .expect("Failed to execute query");
     decks
+}
+
+#[tauri::command]
+fn create_deck(
+    deck_name: String,
+    current_user: State<Arc<CurrentUser>>,
+    mysql_pool: State<Arc<Pool>>,
+) -> Result<(), String> {
+    let user = current_user.user.lock().unwrap();
+    if let Some(user) = &*user {
+        let user_id = user.id.clone();
+        let id = Uuid::new_v4().to_string();
+        let mut conn = mysql_pool.get_conn().map_err(|err| {
+            let error_message = format!("Failed to get connection: {}", err);
+            println!("{}", error_message);
+            error_message
+        })?;
+
+        conn.exec_drop(
+            "INSERT INTO decks (id, user_id, name, new_cards_per_day) VALUES (:id, :user_id, :name, :new_cards_per_day)",
+            params! {
+                "id" => id,
+                "user_id" => user_id,
+                "name" => deck_name,
+                "new_cards_per_day" => 20,
+            },
+        )
+        .map_err(|err| {
+            let error_message = format!("Failed to insert deck into database: {}", err);
+            error_message
+        })?;
+
+        Ok(())
+    } else {
+        Err("No current user".into())
+    }
 }
 
 fn main() {
@@ -248,7 +296,13 @@ fn main() {
     tauri::Builder::default()
         .manage(pool) // Make the MySQL pool available to Tauri commands
         .manage(current_user) // Make the current user state available to Tauri commands
-        .invoke_handler(tauri::generate_handler![login, get_current_user, get_decks,])
+        .invoke_handler(tauri::generate_handler![
+            login,
+            register,
+            get_current_user,
+            get_decks,
+            create_deck,
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

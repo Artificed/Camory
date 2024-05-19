@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "./components/navbar";
-import Button from "./components/button";
+import Navbar from "./components/Navbar";
+import Button from "./components/Button";
 import { invoke } from '@tauri-apps/api';
 
 function RegisterPage() {
