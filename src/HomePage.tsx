@@ -85,8 +85,8 @@ function HomePage() {
                     <input type="text" name="" id="" className="theme-brown-medium rounded-lg w-2/3 h-12 mt-10 mr-3 p-3" placeholder="Enter Deck Name"/>
                     <Button text="Search" className="p-3 bright-red w-24 mt-10 ml-3 text-sm border-none"/>
                 </form>
-                <div className="flex justify-start w-5/6 my-5" onClick={handleCreateDeckClick}>
-                    <Button text="+ Create Deck" className="w-36 h-8 text-xs theme-green"/>
+                <div className="flex justify-start w-5/6 my-5">
+                    <Button text="+ Create Deck" className="w-36 h-8 text-xs theme-green" onclick={handleCreateDeckClick}/>
                 </div>
                 {user ? (
                     <div className="w-5/6">

@@ -35,6 +35,10 @@ function CreateDeckPage() {
         };
         fetchCurrentUser();
     }, [navigate]);
+
+    const handleLogoClick = () => {
+        navigate('/home');
+    }
     
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -54,7 +58,7 @@ function CreateDeckPage() {
     return (
         <div className="theme-brown-light h-screen flex flex-col items-center justify-center">
             <div className="flex items-center">
-                <img src={logo} className="h-36 mr-3"/>
+                <img src={logo} className="h-36 mr-3 hover:cursor-pointer" onClick={handleLogoClick}/>
                 <form onSubmit={handleSubmit} className="flex flex-col items-center justify-center ml-3">
                     <input type="text" value={deckName} className="p-4 w-72 text-2xl text-blue-950 rounded-xl border border-gray-400" 
                     onChange={(e) => setDeckName(e.target.value)} placeholder="Your Deck Name"/>
