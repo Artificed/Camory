@@ -18,6 +18,7 @@ serde_json = "1"
 mysql = "*"
 bcrypt = "*"
 chrono = "*"
+multipart = "0.16.1"
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import settings_img from '../assets/settings.png'
 import plus_img from '../assets/plus.png'
 import { useNavigate } from 'react-router-dom';
@@ -29,15 +29,15 @@ const DeckCard: React.FC<DeckCardProps> = ({ deck }) => {
 
     const navigate = useNavigate();
 
-    const getNew = (deck: Deck) => {
+    const getNewCount = (deck: Deck) => {
         return deck.cards.filter(card => card.status === 'new').length;
     }
 
-    const getLearn = (deck : Deck) => {
+    const getLearnCount = (deck : Deck) => {
         return deck.cards.filter(card => card.status === 'learn' || card.status === 'relearn').length;
     }
 
-    const getDue = (deck : Deck) => {
+    const getDueCount = (deck : Deck) => {
         return deck.cards.filter(card => card.status === 'due' && card.due_in === 0).length;
     }
 
@@ -61,9 +61,9 @@ const DeckCard: React.FC<DeckCardProps> = ({ deck }) => {
             </div>
             <div className="grid grid-cols-2 mt-1">
                 <div className="flex">
-                    <p className="text-gray-600 text-xs mr-8">New: {getNew(deck)}</p>
-                    <p className="text-gray-600 text-xs mr-8">Learn: {getLearn(deck)}</p>
-                    <p className="text-gray-600 text-xs">Due: {getDue(deck)}</p>
+                    <p className="text-gray-600 text-xs mr-8">New: {getNewCount(deck)}</p>
+                    <p className="text-gray-600 text-xs mr-8">Learn: {getLearnCount(deck)}</p>
+                    <p className="text-gray-600 text-xs">Due: {getDueCount(deck)}</p>
                 </div>
                 <div className="flex justify-end">
                     <p className="text-gray-600 text-xs">Total cards: {deck.cards.length}</p>

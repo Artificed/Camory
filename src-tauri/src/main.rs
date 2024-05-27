@@ -151,7 +151,6 @@ struct CardContent {
     description: String,
 }
 
-
 #[tauri::command]
 fn get_card_content(card_id: String, mysql_pool: &State<Arc<Pool>>) -> Option<CardContent> {
     let mut conn = mysql_pool.get_conn().expect("Failed to get connection");
@@ -212,6 +211,29 @@ fn get_cards_for_deck(deck_id: String, mysql_pool: &State<Arc<Pool>>) -> Vec<Car
         },
     )
     .expect("Failed to execute query for cards")
+}
+
+#[tauri::command]
+fn get_deck_by_id(deck_id: String, mysql_pool: State<Arc<Pool>>) -> Option<Deck> {
+    let mut conn = mysql_pool.get_conn().expect("Failed to get connection");
+    let result: Option<(String, String, String, i16)> = conn.exec_first(
+        "SELECT id, user_id, name, new_cards_per_day
+         FROM decks
+         WHERE id = :deck_id",
+        params! {
+            "deck_id" => deck_id,
+        },
+    ).expect("Failed to execute query");
+    result.map(|(id, user_id, name, new_cards_per_day)| {
+        let cards = get_cards_for_deck(id.clone(), &mysql_pool);
+        Deck {
+            id,
+            user_id,
+            name,
+            cards,
+            new_cards_per_day,
+        }
+    })
 }
 
 #[tauri::command]
@@ -379,7 +401,8 @@ fn main() {
             get_decks,
             create_deck,
             insert_card_content,
-            insert_card
+            insert_card,
+            get_deck_by_id
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
