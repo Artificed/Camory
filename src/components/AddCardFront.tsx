@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface AddCardFrontProps {
     vocabulary: string;
     setVocabulary: (vocabulary: string) => void;
@@ -9,15 +7,14 @@ interface AddCardFrontProps {
 
 function AddCardFront({ vocabulary, setVocabulary, clue, setClue }: AddCardFrontProps) {
     return (
-        <form className="flex items-center bg-white aspect-square rounded-3xl
-            border-b-2 border-r-2 border-gray-200 flex-col justify-center *:my-5">
-            <input type="text" value={vocabulary} className="w-full text-2xl text-blue-950 rounded-xl
-                focus:outline-none font-extrabold text-center" 
+        <div className="flex flex-col justify-center items-center">
+            <input type="text" value={vocabulary} className="w-full text-4xl text-blue-950 rounded-xl
+                focus:outline-none font-extrabold text-center mt-36" 
                 onChange={(e) => setVocabulary(e.target.value)} placeholder="Question"/>
-            <input type="text" value={clue} className="w-full text-base text-blue-950 rounded-xl
-                focus:outline-none text-center" 
+            <input type="text" value={clue} className="w-full text-2xl text-blue-950 rounded-xl
+                focus:outline-none text-center mt-20" 
                 onChange={(e) => setClue(e.target.value)} placeholder="Clue"/>
-        </form>
+        </div>
     );
 }
 

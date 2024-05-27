@@ -17,6 +17,7 @@ uuid = { version = "1.0", features = ["v4"] }
 serde_json = "1"
 mysql = "*"
 bcrypt = "*"
+chrono = "*"
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!

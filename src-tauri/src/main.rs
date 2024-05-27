@@ -136,7 +136,7 @@ struct Card {
     status: String,
     ease: f32,
     interval: i16,
-    due_in: i16,
+    due: Option<String>,
     fails: i16,
     content: Option<CardContent>,
 }
@@ -150,6 +150,7 @@ struct CardContent {
     definition: String,
     description: String,
 }
+
 
 #[tauri::command]
 fn get_card_content(card_id: String, mysql_pool: &State<Arc<Pool>>) -> Option<CardContent> {
@@ -182,19 +183,19 @@ fn get_cards_for_deck(deck_id: String, mysql_pool: &State<Arc<Pool>>) -> Vec<Car
     let mut conn = mysql_pool.get_conn().expect("Failed to get connection");
 
     conn.exec_map(
-        "SELECT id, deck_id, status, ease, `interval`, due_in, fails
+        "SELECT id, deck_id, status, ease, `interval`, due, fails
          FROM cards
          WHERE deck_id = :deck_id",
         params! {
             "deck_id" => deck_id,
         },
-        |(id, deck_id, status, ease, interval, due_in, fails): (
+        |(id, deck_id, status, ease, interval, due, fails): (
             String,
             String,
             String,
             f64,
             i32,
-            i32,
+            Option<String>,
             i32,
         )| {
             let content = get_card_content(id.clone(), mysql_pool);
@@ -204,7 +205,7 @@ fn get_cards_for_deck(deck_id: String, mysql_pool: &State<Arc<Pool>>) -> Vec<Car
                 status,
                 ease: ease as f32,
                 interval: interval as i16,
-                due_in: due_in as i16,
+                due,
                 fails: fails as i16,
                 content,
             }
@@ -276,6 +277,83 @@ fn create_deck(
     }
 }
 
+#[tauri::command]
+async fn insert_card_content(
+    card_id: String,
+    vocabulary: String,
+    clue: String,
+    asset: String,
+    definition: String,
+    description: String,
+    mysql_pool: State<'_, mysql::Pool>,
+) -> Result<(), String> {
+    let mut conn = mysql_pool
+        .get_conn()
+        .map_err(|e| format!("Failed to get connection: {:?}", e))?;
+
+    let result_note = conn.exec_drop(
+        "INSERT INTO card_contents (card_id, vocabulary, clue, asset, definition, description)
+        VALUES (:card_id, :vocabulary, :clue, :asset, :definition, :description);",
+        params! {
+            "card_id" => card_id,
+            "vocabulary" => vocabulary,
+            "clue" => clue,
+            "asset" => asset,
+            "definition" => definition,
+            "description" => description,
+        },
+    );
+
+    if let Err(e) = result_note {
+        return Err(format!("Failed to insert into card content: {:?}", e));
+    }
+
+    Ok(())
+}
+
+
+#[tauri::command]
+async fn insert_card(
+    deck_id: String,
+    vocabulary: String,
+    clue: String,
+    asset: String,
+    definition: String,
+    description: String,
+    mysql_pool: State<'_, mysql::Pool>,
+) -> Result<(), String> {
+    let mut conn = mysql_pool
+        .get_conn()
+        .map_err(|e| format!("Failed to get connection: {:?}", e))?;
+
+    let id = Uuid::new_v4().to_string();
+
+    println!("{deck_id}, {vocabulary}, {clue}, {asset}, {definition}, {description}");
+
+    let result_card = conn.exec_drop(
+        "INSERT INTO cards (id, deck_id, status, ease, interval, fails)
+        VALUES (:id, :deck_id, :status, :ease, :interval, :fails)",
+        params! {
+            "id" => id.clone(),
+            "deck_id" => deck_id,
+            "status" => "new",
+            "ease" => 2.5,
+            "interval" => 0,
+            "fails" => 0
+        },
+    );
+
+    if let Err(e) = result_card {
+        return Err(format!("Failed to insert into cards: {:?}", e));
+    }
+
+    if let Err(e) = insert_card_content(id.clone(), vocabulary, clue, asset, definition, description, mysql_pool).await {
+        return Err(format!("Failed to insert into card content: {:?}", e));
+    }
+
+    Ok(())
+}
+
 fn main() {
     let mysql_config = MySQLConfig::new(
         "root".to_string(),
@@ -302,6 +380,8 @@ fn main() {
             get_current_user,
             get_decks,
             create_deck,
+            insert_card_content,
+            insert_card
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
