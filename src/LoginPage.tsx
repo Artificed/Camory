@@ -3,12 +3,17 @@ import { invoke } from "@tauri-apps/api";
 import { useNavigate } from "react-router-dom";
 import Navbar from './components/Navbar'
 import Button from './components/Button';
+import logo from './assets/logo.png';
 
 function LoginPage() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState(""); 
     const navigate = useNavigate();
+
+    const handleLogoClick = () => {
+        navigate('/');
+    }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -30,8 +35,10 @@ function LoginPage() {
     };
 
     return (
-        <div className="h-screen flex flex-col items-center justify-center">
-            <Navbar />
+        <div className="h-screen flex flex-col items-center justify-center -translate-y-5">
+
+            <img src={logo} className='mb-5 hover:cursor-pointer' onClick={handleLogoClick}/>
+
             <form onSubmit={handleSubmit} 
                 className='theme-brown-light w-2/5 h-1/2 border border-gray-400 
                 flex flex-col items-center rounded-2xl p-8'>

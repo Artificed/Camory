@@ -21,7 +21,7 @@ CREATE TABLE decks (
     FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-INSERT INTO decks (id, user_id, name)
+INSERT INTO decks (id, user_id, name, new_cards_per_day)
 VALUES
 ('018f8c8e-88df-7651-82e0-eae84b90def6', 'a77ab6ae-aa1e-4261-a12d-5bcc69a0d04f', 'english', 20),
 ('018f8c8f-93c6-79fb-beae-d35f88920a64', 'a77ab6ae-aa1e-4261-a12d-5bcc69a0d04f', 'japanese', 20);
@@ -33,16 +33,16 @@ CREATE TABLE cards (
     ease DOUBLE NOT NULL,
     `interval` INT NOT NULL,
     fails INT NOT NULL,
-    due_in INT NOT NULL,
+    due DATE,
     FOREIGN KEY (deck_id) REFERENCES decks(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-INSERT INTO cards(id, deck_id, `status`, ease, `interval`, fails, due_in)
+INSERT INTO cards(id, deck_id, `status`, ease, `interval`, fails)
 VALUES
-('ec64de29-01c7-43f4-b6b6-e661243e0bd9', '018f8c8e-88df-7651-82e0-eae84b90def6', 'new', 2.5, 0, 0, 0),
-('922a8553-5e72-4013-b319-87c1d52b065e', '018f8c8e-88df-7651-82e0-eae84b90def6', 'new', 2.5, 0, 0, 0),
-('c4c828d7-f59b-48ae-8bd9-3580de0b4914', '018f8c8e-88df-7651-82e0-eae84b90def6', 'new', 2.5, 0, 0, 0),
-('cea43fd4-ace0-458a-b08e-7db46848b0f9', '018f8c8e-88df-7651-82e0-eae84b90def6', 'new', 2.5, 0, 0, 0);
+('ec64de29-01c7-43f4-b6b6-e661243e0bd9', '018f8c8e-88df-7651-82e0-eae84b90def6', 'new', 2.5, 0, 0),
+('922a8553-5e72-4013-b319-87c1d52b065e', '018f8c8e-88df-7651-82e0-eae84b90def6', 'new', 2.5, 0, 0),
+('c4c828d7-f59b-48ae-8bd9-3580de0b4914', '018f8c8e-88df-7651-82e0-eae84b90def6', 'new', 2.5, 0, 0),
+('cea43fd4-ace0-458a-b08e-7db46848b0f9', '018f8c8e-88df-7651-82e0-eae84b90def6', 'new', 2.5, 0, 0);
 
 CREATE TABLE card_contents(
 	card_id CHAR(36) NOT NULL,

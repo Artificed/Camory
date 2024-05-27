@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Button from "./components/Button";
+import logo from './assets/logo.png';
 import { invoke } from '@tauri-apps/api';
 
 function RegisterPage() {
@@ -12,6 +13,10 @@ function RegisterPage() {
 
     const [errorMessage, setErrorMessage] = useState("");
     const navigate = useNavigate();
+
+    const handleLogoClick = () => {
+        navigate('/');
+    }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -35,8 +40,10 @@ function RegisterPage() {
     };
 
     return (
-        <div className="h-screen flex flex-col items-center justify-center">
-            <Navbar />
+        <div className="h-screen flex flex-col items-center justify-center -translate-y-5">
+            
+            <img src={logo} onClick={handleLogoClick} className="hover:cursor-pointer" />
+
             <form onSubmit={handleSubmit} 
                 className='theme-brown-light w-2/5 h-3/5 border border-gray-400 
                     flex flex-col items-center rounded-2xl translate-y-5'>

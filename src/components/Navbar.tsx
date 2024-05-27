@@ -7,7 +7,7 @@ function Navbar() {
     const navigate = useNavigate()
 
     const handleLogoClick = () => {
-        navigate('/');
+        navigate('/home');
     }
 
     return (

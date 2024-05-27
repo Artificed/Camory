@@ -16,7 +16,6 @@ function LandingPage() {
 
     return (
         <div className="h-screen flex flex-col items-center justify-center" style={{backgroundImage: `url(${home_bg})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat'}}>
-            <Navbar/>
             <div className="flex translate-y-28">
                 <Button text='Login' className='m-4 bright-red w-32 h-10 text-base' onclick={handleLoginButton}/>
                 <Button text='Sign Up' className='m-4 bright-red w-32 h-10 text-base' onclick={handleRegisterButton}/>
