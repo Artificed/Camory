@@ -278,14 +278,14 @@ fn create_deck(
 }
 
 #[tauri::command]
-async fn insert_card_content(
+fn insert_card_content(
     card_id: String,
     vocabulary: String,
     clue: String,
     asset: String,
     definition: String,
     description: String,
-    mysql_pool: State<'_, mysql::Pool>,
+    mysql_pool: State<Arc<Pool>>,
 ) -> Result<(), String> {
     let mut conn = mysql_pool
         .get_conn()
@@ -313,14 +313,14 @@ async fn insert_card_content(
 
 
 #[tauri::command]
-async fn insert_card(
+fn insert_card(
     deck_id: String,
     vocabulary: String,
     clue: String,
     asset: String,
     definition: String,
     description: String,
-    mysql_pool: State<'_, mysql::Pool>,
+    mysql_pool: State<Arc<Pool>>,
 ) -> Result<(), String> {
     let mut conn = mysql_pool
         .get_conn()
@@ -328,13 +328,11 @@ async fn insert_card(
 
     let id = Uuid::new_v4().to_string();
 
-    println!("{deck_id}, {vocabulary}, {clue}, {asset}, {definition}, {description}");
-
     let result_card = conn.exec_drop(
-        "INSERT INTO cards (id, deck_id, status, ease, interval, fails)
+        "INSERT INTO cards (id, deck_id, status, ease, `interval`, fails)
         VALUES (:id, :deck_id, :status, :ease, :interval, :fails)",
         params! {
-            "id" => id.clone(),
+            "id" => &id,
             "deck_id" => deck_id,
             "status" => "new",
             "ease" => 2.5,
@@ -347,7 +345,7 @@ async fn insert_card(
         return Err(format!("Failed to insert into cards: {:?}", e));
     }
 
-    if let Err(e) = insert_card_content(id.clone(), vocabulary, clue, asset, definition, description, mysql_pool).await {
+    if let Err(e) = insert_card_content(id, vocabulary, clue, asset, definition, description, mysql_pool) {
         return Err(format!("Failed to insert into card content: {:?}", e));
     }
 

@@ -8,7 +8,7 @@ import { invoke } from '@tauri-apps/api';
 
 function AddCardPage() {
 
-    const deck_id = useParams();
+    const deckId = useParams();
     const navigate = useNavigate();
 
     const [pageNumber, setPageNumber] = useState(1);
@@ -44,8 +44,9 @@ function AddCardPage() {
             setErrorMessage("Description cannot be empty!");
             return;
         } 
+        let temp = deckId.deck_id;
         try {
-            await invoke('insert_card', { deck_id, vocabulary, clue, asset, definition, description });
+            await invoke('insert_card', { deckId: temp, vocabulary, clue, asset, definition, description });
             navigate('/home');
         } catch (error) {
             setErrorMessage("Create Card Failed!");
