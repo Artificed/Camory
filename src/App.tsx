@@ -4,6 +4,7 @@ import LoginPage from './LoginPage';
 import RegisterPage from './RegisterPage';
 import HomePage from './HomePage';
 import CreateDeckPage from './CreateDeckPage';
+import AddCardPage from './AddCardPage';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/create-deck" element={<CreateDeckPage />} />
+        <Route path="/add-card/:deck_id" element={<AddCardPage />}/>
       </Routes>
     </Router>
   );

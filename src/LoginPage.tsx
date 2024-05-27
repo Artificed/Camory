@@ -32,12 +32,21 @@ function LoginPage() {
     return (
         <div className="h-screen flex flex-col items-center justify-center">
             <Navbar />
-            <form onSubmit={handleSubmit} className='theme-brown-light w-2/5 h-3/5 border border-gray-400 flex flex-col items-center rounded-2xl p-8'>
+            <form onSubmit={handleSubmit} 
+                className='theme-brown-light w-2/5 h-1/2 border border-gray-400 
+                flex flex-col items-center rounded-2xl p-8'>
+
                 <p className="text-2xl mt-4">Login</p>
-                <input type="text" name="username" value={username} className="mt-8 p-2 w-5/6 rounded-lg border-b-2" onChange={(e) => setUsername(e.target.value)} placeholder="Username"/>
-                <input type="password" name="password" value={password} className="mt-8 w-5/6 p-2 rounded-lg border-b-2" onChange={(e) => setPassword(e.target.value)} placeholder="Password"/>
-                {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
-                <Button text="Login" className="theme-brown-dark mt-10 lg:mt-24" />
+
+                <input type="text" name="username" value={username} className="mt-8 p-2 w-5/6 rounded-lg border-b-2" 
+                onChange={(e) => setUsername(e.target.value)} placeholder="Username"/>
+
+                <input type="password" name="password" value={password} className="mt-8 w-5/6 p-2 rounded-lg border-b-2" 
+                onChange={(e) => setPassword(e.target.value)} placeholder="Password"/>
+
+                {errorMessage && <p className="text-red-500 absolute mt-56">{errorMessage}</p>}
+
+                <Button text="Login" className="theme-brown-dark mt-16" />
             </form>
         </div>
     );

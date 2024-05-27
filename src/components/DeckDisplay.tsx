@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import settings_img from '../assets/settings.png'
 import plus_img from '../assets/plus.png'
+import { useNavigate } from 'react-router-dom';
 
 interface Card {
     id: string;
@@ -13,6 +14,7 @@ interface Card {
 }
 
 interface Deck {
+    id: string;
     name: string;
     user_id: string;
     new_cards_per_day: number;
@@ -24,6 +26,8 @@ interface DeckCardProps {
 }
 
 const DeckCard: React.FC<DeckCardProps> = ({ deck }) => {
+
+    const navigate = useNavigate();
 
     const getNew = (deck: Deck) => {
         return deck.cards.filter(card => card.status === 'new').length;
@@ -37,14 +41,17 @@ const DeckCard: React.FC<DeckCardProps> = ({ deck }) => {
         return deck.cards.filter(card => card.status === 'due' && card.due_in === 0).length;
     }
 
-    
+    const handlePlusButtonClick = () => {
+        navigate(`/add-card/${deck.id}`);
+    };
+
     return (
         <div className="px-6 py-4 mb-4 rounded-lg theme-blue-light">
             <div className="grid grid-cols-2">
                 <p>{deck.name}</p>
                 <div className="flex justify-end translate-y-1">
-                    <img src={plus_img} className="h-5 w-5 opacity-50" />
-                    <img src={settings_img} className="h-5 w-5 ml-2 opacity-60" />
+                    <img src={plus_img} className="h-5 w-5 opacity-50 hover:cursor-pointer" onClick={handlePlusButtonClick}/>
+                    <img src={settings_img} className="h-5 w-5 ml-2 opacity-60 hover:cursor-pointer" />
                 </div>
             </div>
             <div className="grid grid-cols-2 mt-1">

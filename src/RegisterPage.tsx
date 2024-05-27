@@ -37,14 +37,17 @@ function RegisterPage() {
     return (
         <div className="h-screen flex flex-col items-center justify-center">
             <Navbar />
-            <form onSubmit={handleSubmit} className='theme-brown-light w-2/5 h-2/3 border border-gray-400 flex flex-col items-center rounded-2xl translate-y-5'>
-                <p className="text-2xl mt-4">Register</p>
+            <form onSubmit={handleSubmit} 
+                className='theme-brown-light w-2/5 h-3/5 border border-gray-400 
+                    flex flex-col items-center rounded-2xl translate-y-5'>
+
+                <p className="text-2xl mt-8">Sign Up</p>
 
                 <input
                     type="text"
                     name="username"
                     value={username}
-                    className="mt-5 p-2 w-5/6 rounded-lg border-b-2"
+                    className="mt-6 p-2 w-5/6 rounded-lg border-b-2"
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="Username"
                 />
@@ -53,7 +56,7 @@ function RegisterPage() {
                     type="email"
                     name="email"
                     value={email}
-                    className="mt-5 p-2 w-5/6 rounded-lg border-b-2"
+                    className="mt-6 p-2 w-5/6 rounded-lg border-b-2"
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Email"
                 />
@@ -62,7 +65,7 @@ function RegisterPage() {
                     type="password"
                     name="password"
                     value={password}
-                    className="mt-5 w-5/6 p-2 rounded-lg border-b-2"
+                    className="mt-6 w-5/6 p-2 rounded-lg border-b-2"
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Password"
                 />
@@ -71,13 +74,14 @@ function RegisterPage() {
                     type="password"
                     name="confirm_password"
                     value={confirmPassword}
-                    className="mt-5 w-5/6 p-2 rounded-lg border-b-2"
+                    className="mt-6 w-5/6 p-2 rounded-lg border-b-2"
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirm Your Password"
                 />
 
-                {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
-                <Button text="Register" className="theme-brown-dark mt-5 h-9 lg:mt-16" />
+                {errorMessage && <p className="text-red-500 absolute bottom-24">{errorMessage}</p>}
+                
+                <Button text="Register" className="theme-brown-dark h-9 mt-14" />
             </form>
         </div>
     );
