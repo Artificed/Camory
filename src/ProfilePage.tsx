@@ -15,6 +15,10 @@ function ProfilePage() {
     const navigate = useNavigate();
     const [user, setUser] = useState<User | null>(null);
 
+    const handleStatisticClick = () => {
+        navigate('/statistic')
+    }
+
     useEffect(() => {
         const fetchCurrentUser = async () => {
             try {
@@ -36,10 +40,12 @@ function ProfilePage() {
     return (
         <div>
             <Navbar />
-            <div className="mt-16 ml-8 flex justify-start">
-                <h1 className="text-2xl p-4 justify-self-start">My Account</h1>
-            </div>
-            <div className="flex flex-col justify-center items-center">
+            <div className="content">
+                <div className="flex justify-start mb-6">
+                    <h1 className="title">My Account</h1>
+                </div>
+
+                <div className="flex flex-col justify-center items-center">
                 <div>
                     <img src="./src/assets/profile_picture.jpg" alt="" className='w-60 relative z-10 rounded-full object-cover'/>
                 </div>
@@ -52,10 +58,12 @@ function ProfilePage() {
                         {user && <li className="mb-4">{user.email}</li>}
                     </ul>
                     <div className="flex justify-center">
-                        <Button text="View Statistic" className="w-fit m-4 pl-5 pr-5 theme-blue text-xs"></Button>
+                        <Button text="View Statistic" className="w-fit m-4 pl-5 pr-5 theme-blue text-xs" onclick={handleStatisticClick}></Button>
                     </div>
                 </div>
             </div>
+            </div>
+            
         </div>
     );
 }
