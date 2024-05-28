@@ -80,7 +80,7 @@ function HomePage() {
     return (
         <div>
             <Navbar />
-            <div className="mt-16 flex flex-col items-center">
+            <div className="mt-16 flex flex-col items-center hide-scrollbar">
                 <form action="" className="flex justify-center w-5/6">
                     <input type="text" name="" id="" className="theme-brown-medium rounded-lg w-2/3 h-12 mt-10 mr-3 p-3" placeholder="Enter Deck Name"/>
                     <Button text="Search" className="p-3 bright-red w-24 mt-10 ml-3 text-sm border-none"/>

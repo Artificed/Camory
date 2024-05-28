@@ -12,12 +12,12 @@ tauri-build = { version = "1", features = [] }
 
 [dependencies]
 tauri = { version = "1", features = ["shell-open"] }
-serde = { version = "1", features = ["derive"] }
 uuid = { version = "1.0", features = ["v4"] }
-serde_json = "1"
-mysql = "*"
+mysql = { version = "*", features = ["chrono"] }
+chrono = { version = "0.4", features = ["serde"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
 bcrypt = "*"
-chrono = "*"
 multipart = "0.16.1"
 base64 = "*"
 

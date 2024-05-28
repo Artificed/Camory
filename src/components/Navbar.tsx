@@ -23,19 +23,19 @@ function Navbar() {
             <div className={sidebar ? "" : "collapse absolute"}>
                 <ul className="text-sm mt-6 hidden md:block hover:cursor-pointer" id="menu">
                     <li className="text-gray-700 font-bold py-1 hover:bg-slate-100">
-                        <a className="block px-4 flex justify-end" onClick={() => navigate('/home')}>
+                        <a className="px-4 flex justify-end" onClick={() => navigate('/home')}>
                         <span>Home</span>
                         <AiFillHome className="w-5 ml-2 size-5"/>
                         </a>
                     </li>
                     <li className="py-1 hover:cursor-pointer hover:bg-slate-100">
-                        <a className="block px-4 flex justify-end" onClick={() => navigate('/profile')}>
+                        <a className="px-4 flex justify-end" onClick={() => navigate('/profile')}>
                         <span>Profile</span>
                         <CgProfile className="w-5 ml-2 size-5"/>
                         </a>
                     </li>
                     <li className="py-1 hover:cursor-pointer hover:bg-slate-100">
-                        <a className="block px-4 flex justify-end" onClick={() => navigate('/')}>
+                        <a className="px-4 flex justify-end" onClick={() => navigate('/')}>
                         <span>Logout</span>
                         <IoIosLogOut className="w-5 ml-2 size-5"/>
                         </a>

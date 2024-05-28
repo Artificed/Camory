@@ -50,3 +50,13 @@
 .content {
     @apply mt-16 p-4 pl-12 pr-12;
 }
+
+body::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
+
+body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}

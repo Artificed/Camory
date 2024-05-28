@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api";
 import CardFront from "./components/CardFront";
 import CardBack from "./components/CardBack";
-import Button from "./components/Button";
 
 interface Deck {
     id: string;
@@ -41,73 +40,98 @@ function LearningPage() {
     const [deck, setDeck] = useState<Deck>();
     const [currentIndex, setCurrentIndex] = useState(0);
     const [showFront, setShowFront] = useState(true);
-    
+
+    const [newCards, setNewCards] = useState<Card[]>([]);
+    const [learningCards, setLearningCards] = useState<Card[]>([]);
+    const [relearningCards, setRelearningCards] = useState<Card[]>([]);
+    const [dueCards, setDueCards] = useState<Card[]>([]);
+
+    const [cardList, setCardList] = useState<Card[]>([]);
+
     useEffect(() => {
         const fetchDeck = async () => {
             try {
                 const result = await invoke<Deck>("get_deck_by_id", { deckId: params.deck_id });
                 setDeck(result);
+                setNewCards(result.cards.filter(card => card.status === 'new'));
+                setLearningCards(result.cards.filter(card => card.status === 'learning'));
+                setRelearningCards(result.cards.filter(card => card.status === 'relearning'));
+                setDueCards(result.cards.filter(card => card.status === 'due'));
             } catch (error) {
-                console.error("Error retrieving decks:", error);
+                console.error("Error retrieving deck:", error);
             }
         };
         fetchDeck();
     }, [params.deck_id]);
 
-    const getNewCards = (deck: Deck) => {
-        return deck.cards.filter(card => card.status === 'new');
-    }
-
-    const getLearningCards = (deck : Deck) => {
-        return deck.cards.filter(card => card.status === 'learn' || card.status === 'relearn');
-    }
-
-    const getDueCards = (deck : Deck) => {
-        return deck.cards.filter(card => card.status === 'due' && card.due_in === 0);
-    }
-
     const handleShowAnswer = () => {
         setShowFront(false);
     };
 
-    const nextCard = () => {
-        if (deck && currentIndex < deck.cards.length - 1) {
+    const nextCard = (cards: Card[]) => {
+        if (currentIndex < cards.length - 1) {
             setCurrentIndex(currentIndex + 1);
+            setShowFront(true);
+        } else {
+            setCurrentIndex(0);
             setShowFront(true);
         }
     };
 
-    const handleFail = () => {
-        // Fail Logic Here
-        nextCard()
-    }
+    const handleFail = async (cards: Card[]) => {
+        if(cards[currentIndex].status === 'new') {
+            console.log('test')
+            try {
+                await invoke('fail_learning_card', { 
+                    cardId: cards[currentIndex].id,
+                });
+            } catch (error) {
+                console.error("Error retrieving decks:", error);
+            }
+        }
+        nextCard(cards);
+    };
 
-    const handlePass = () => {
-        // Pass Logic Here
-        nextCard()
-    }
+    const handlePass = async (cards: Card[]) => {
+        if(cards[currentIndex].status === 'new') {
+            try {
+                await invoke('pass_new_card', { 
+                    cardId: cards[currentIndex].id,
+                });
+            } catch (error) {
+                console.error("Error retrieving decks:", error);
+            }
+        }
+        nextCard(cards);
+    };
 
     return (
-        <div className="">
+        <div>
             <Navbar />
-            <div className="">
-                {deck && deck.cards.length > 0 && (
+            <div>
+                <div className="absolute mt-60">
+                    {newCards.length}
+                    {learningCards.length}
+                    {dueCards.length}
+                    {deck?.cards.length}
+                </div>
+                {newCards.length > 0 && (
                     <>
                         {showFront ? (
                             <CardFront
-                                vocabulary={deck.cards[currentIndex].content?.vocabulary}
-                                clue={deck.cards[currentIndex].content?.clue}
+                                vocabulary={newCards[currentIndex]?.content?.vocabulary || ""}
+                                clue={newCards[currentIndex]?.content?.clue || ""}
                                 onShowAnswer={handleShowAnswer}
                             />
                         ) : (
                             <CardBack
-                                vocabulary={deck.cards[currentIndex].content?.vocabulary}
-                                clue={deck.cards[currentIndex].content?.clue}
-                                asset={deck.cards[currentIndex].content?.asset}
-                                definition={deck.cards[currentIndex].content?.definition}
-                                description={deck.cards[currentIndex].content?.description}
-                                onPass={handlePass}
-                                onFail={handleFail}
+                                vocabulary={newCards[currentIndex]?.content?.vocabulary || ""}
+                                clue={newCards[currentIndex]?.content?.clue || ""}
+                                asset={newCards[currentIndex]?.content?.asset || ""}
+                                definition={newCards[currentIndex]?.content?.definition || ""}
+                                description={newCards[currentIndex]?.content?.description || ""}
+                                onPass={() => handlePass(newCards)}
+                                onFail={() => handleFail(newCards)}
                             />
                         )}
                     </>
@@ -115,7 +139,6 @@ function LearningPage() {
             </div>
         </div>
     );
-
 }
 
 export default LearningPage;

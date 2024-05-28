@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 use std::sync::{Arc, Mutex};
 use tauri::State;
 use uuid::Uuid;
+use chrono::NaiveDateTime;
 
 impl MySQLConfig {
     fn new(username: String, password: String, host: String, database: String) -> Self {
@@ -135,9 +136,10 @@ struct Card {
     deck_id: String,
     status: String,
     ease: f32,
-    interval: i16,
-    due: Option<String>,
     fails: i16,
+    streak: i16,
+    previous_due: NaiveDateTime,
+    due: NaiveDateTime,
     content: Option<CardContent>,
 }
 
@@ -178,24 +180,28 @@ fn get_card_content(card_id: String, mysql_pool: &State<Arc<Pool>>) -> Option<Ca
     )
 }
 
+fn parse_naive_datetime(datetime_str: &str) -> NaiveDateTime {
+    NaiveDateTime::parse_from_str(datetime_str, "%Y-%m-%d %H:%M:%S").expect("Failed to parse date")
+}
+
 fn get_cards_for_deck(deck_id: String, mysql_pool: &State<Arc<Pool>>) -> Vec<Card> {
     let mut conn = mysql_pool.get_conn().expect("Failed to get connection");
-
     conn.exec_map(
-        "SELECT id, deck_id, status, ease, `interval`, due, fails
+        "SELECT id, deck_id, status, ease, fails, streak, CAST(previous_due AS CHAR) AS previous_due, CAST(due AS CHAR) AS due
          FROM cards
          WHERE deck_id = :deck_id",
         params! {
             "deck_id" => deck_id,
         },
-        |(id, deck_id, status, ease, interval, due, fails): (
+        |(id, deck_id, status, ease, fails, streak, previous_due, due): (
             String,
             String,
             String,
             f64,
             i32,
-            Option<String>,
             i32,
+            String,
+            String,
         )| {
             let content = get_card_content(id.clone(), mysql_pool);
             Card {
@@ -203,9 +209,10 @@ fn get_cards_for_deck(deck_id: String, mysql_pool: &State<Arc<Pool>>) -> Vec<Car
                 deck_id,
                 status,
                 ease: ease as f32,
-                interval: interval as i16,
-                due,
                 fails: fails as i16,
+                streak: streak as i16,
+                previous_due: parse_naive_datetime(&previous_due),
+                due: parse_naive_datetime(&due),
                 content,
             }
         },
@@ -348,15 +355,12 @@ fn insert_card(
 
     let id = Uuid::new_v4().to_string();
     let result_card = conn.exec_drop(
-        "INSERT INTO cards (id, deck_id, status, ease, `interval`, fails)
-        VALUES (:id, :deck_id, :status, :ease, :interval, :fails)",
+        "INSERT INTO cards (id, deck_id, status)
+        VALUES (:id, :deck_id, :status)",
         params! {
             "id" => &id,
             "deck_id" => deck_id,
-            "status" => "new",
-            "ease" => 2.5,
-            "interval" => 0,
-            "fails" => 0
+            "status" => "new"
         },
     );
 
@@ -370,6 +374,51 @@ fn insert_card(
 
     Ok(())
 }
+
+#[tauri::command]
+fn fail_learning_card(
+    card_id: String,
+    mysql_pool: State<Arc<Pool>>,
+) -> Result<(), String> {
+    let mut conn = mysql_pool
+        .get_conn()
+        .map_err(|e| format!("Failed to get connection: {:?}", e))?;
+    let result_card = conn.exec_drop(
+        "UPDATE cards
+        SET status = 'learning', previous_due = CURRENT_TIMESTAMP, due = DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 1 MINUTE)
+        WHERE id = :id",
+        params! {
+            "id" => card_id
+        },
+    );
+    if let Err(e) = result_card {
+        return Err(format!("Failed to update card: {:?}", e));
+    }
+    Ok(())
+}
+
+#[tauri::command]
+fn pass_new_card(
+    card_id: String,
+    mysql_pool: State<Arc<Pool>>,
+) -> Result<(), String> {
+    let mut conn = mysql_pool
+        .get_conn()
+        .map_err(|e| format!("Failed to get connection: {:?}", e))?;
+    let result_card = conn.exec_drop(
+        "UPDATE cards
+        SET status = 'learning', previous_due = CURRENT_TIMESTAMP, due = DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 10 MINUTE)
+        WHERE id = :id",
+        params! {
+            "id" => card_id
+        },
+    );
+    if let Err(e) = result_card {
+        return Err(format!("Failed to update card: {:?}", e));
+    }
+    Ok(())
+}
+
 
 fn main() {
     let mysql_config = MySQLConfig::new(
@@ -399,7 +448,9 @@ fn main() {
             create_deck,
             insert_card_content,
             insert_card,
-            get_deck_by_id
+            get_deck_by_id,
+            fail_learning_card,
+            pass_new_card,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -34,7 +34,11 @@ const DeckCard: React.FC<DeckCardProps> = ({ deck }) => {
     }
 
     const getLearnCount = (deck : Deck) => {
-        return deck.cards.filter(card => card.status === 'learn' || card.status === 'relearn').length;
+        return deck.cards.filter(card => card.status === 'learning').length;
+    }
+
+    const getRelearningCount = (deck : Deck) => {
+        return deck.cards.filter(card => card.status === 'relearning').length;
     }
 
     const getDueCount = (deck : Deck) => {
@@ -62,7 +66,8 @@ const DeckCard: React.FC<DeckCardProps> = ({ deck }) => {
             <div className="grid grid-cols-2 mt-1">
                 <div className="flex">
                     <p className="text-gray-600 text-xs mr-8">New: {getNewCount(deck)}</p>
-                    <p className="text-gray-600 text-xs mr-8">Learn: {getLearnCount(deck)}</p>
+                    <p className="text-gray-600 text-xs mr-8">Learning: {getLearnCount(deck)}</p>
+                    <p className="text-gray-600 text-xs mr-8">Relearning: {getRelearningCount(deck)}</p>
                     <p className="text-gray-600 text-xs">Due: {getDueCount(deck)}</p>
                 </div>
                 <div className="flex justify-end">
