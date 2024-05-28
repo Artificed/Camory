@@ -48,7 +48,7 @@ CREATE TABLE card_contents(
 	card_id CHAR(36) NOT NULL,
     vocabulary VARCHAR(255) NOT NULL,
     clue VARCHAR(255),
-    asset VARCHAR(255),
+    asset LONGTEXT,
     definition VARCHAR(255) NOT NULL,
     description VARCHAR(255) NOT NULL,
     FOREIGN KEY (card_id) REFERENCES cards(id) ON UPDATE CASCADE ON DELETE CASCADE,

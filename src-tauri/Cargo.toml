@@ -19,6 +19,7 @@ mysql = "*"
 bcrypt = "*"
 chrono = "*"
 multipart = "0.16.1"
+base64 = "*"
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!

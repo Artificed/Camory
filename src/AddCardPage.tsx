@@ -8,7 +8,7 @@ import { invoke } from '@tauri-apps/api';
 
 function AddCardPage() {
 
-    const deckId = useParams();
+    const params = useParams();
     const navigate = useNavigate();
 
     const [pageNumber, setPageNumber] = useState(1);
@@ -16,7 +16,10 @@ function AddCardPage() {
     const [vocabulary, setVocabulary] = useState<string>("");
     const [clue, setClue] = useState<string>("");
 
-    const [asset, setAsset] = useState<string>("");
+    const [asset, setAsset] = useState<File | null>(null);
+
+    const [preview, setPreview] = useState<string | ArrayBuffer | null>(null);
+
     const [definition, setDefinition] = useState<string>("");
     const [description, setDescription] = useState<string>("");
 
@@ -37,6 +40,9 @@ function AddCardPage() {
         } else if (!clue) {
             setErrorMessage("Clue cannot be empty!");
             return;
+        } else if (!asset) {
+            setErrorMessage("Asset cannot be empty!");
+            return;
         } else if (!definition) {
             setErrorMessage("Definition cannot be empty!");
             return;
@@ -44,14 +50,29 @@ function AddCardPage() {
             setErrorMessage("Description cannot be empty!");
             return;
         } 
-        let temp = deckId.deck_id;
-        try {
-            await invoke('insert_card', { deckId: temp, vocabulary, clue, asset, definition, description });
-            navigate('/home');
-        } catch (error) {
-            setErrorMessage("Create Card Failed!");
-            console.error("Create Card Error:", error);
-        }
+
+        const reader = new FileReader();
+        reader.onload = async () => {
+            const fileAsArrayBuffer = reader.result;
+            const uint8Array = new Uint8Array(fileAsArrayBuffer as ArrayBuffer);
+            const base64String = btoa(String.fromCharCode(...uint8Array));
+            const temp = params.deck_id;
+            try {
+                await invoke('insert_card', { 
+                    deckId: temp, 
+                    vocabulary, 
+                    clue, 
+                    asset: base64String, 
+                    definition, 
+                    description 
+                });
+                navigate('/home');
+            } catch (error) {
+                setErrorMessage("Create Card Failed!");
+                console.error("Create Card Error:", error);
+            }
+        };
+        reader.readAsArrayBuffer(asset);
     };
 
     return (
@@ -64,7 +85,7 @@ function AddCardPage() {
                         <AddCardFront vocabulary={vocabulary} setVocabulary={setVocabulary} 
                             clue={clue} setClue={setClue}/>
                     ) : (
-                        <AddCardBack asset={asset} setAsset={setAsset} definition={definition} 
+                        <AddCardBack asset={asset} setAsset={setAsset} preview={preview} setPreview={setPreview} definition={definition} 
                             setDefinition={setDefinition} description={description} setDescription={setDescription}/>
                     )}
                 </form>

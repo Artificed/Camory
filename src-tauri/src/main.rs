@@ -304,7 +304,7 @@ fn insert_card_content(
     card_id: String,
     vocabulary: String,
     clue: String,
-    asset: String,
+    asset: String, // The asset is a base64 encoded string
     definition: String,
     description: String,
     mysql_pool: State<Arc<Pool>>,
@@ -312,12 +312,11 @@ fn insert_card_content(
     let mut conn = mysql_pool
         .get_conn()
         .map_err(|e| format!("Failed to get connection: {:?}", e))?;
-
-    let result_note = conn.exec_drop(
+    let result = conn.exec_drop(
         "INSERT INTO card_contents (card_id, vocabulary, clue, asset, definition, description)
-        VALUES (:card_id, :vocabulary, :clue, :asset, :definition, :description);",
+        VALUES (:card_id, :vocabulary, :clue, :asset, :definition, :description)",
         params! {
-            "card_id" => card_id,
+            "card_id" => &card_id,
             "vocabulary" => vocabulary,
             "clue" => clue,
             "asset" => asset,
@@ -326,20 +325,19 @@ fn insert_card_content(
         },
     );
 
-    if let Err(e) = result_note {
-        return Err(format!("Failed to insert into card content: {:?}", e));
+    if let Err(e) = result {
+        return Err(format!("Failed to insert into card contents: {:?}", e));
     }
 
     Ok(())
 }
-
 
 #[tauri::command]
 fn insert_card(
     deck_id: String,
     vocabulary: String,
     clue: String,
-    asset: String,
+    asset: String, // The asset is a base64 encoded string
     definition: String,
     description: String,
     mysql_pool: State<Arc<Pool>>,
@@ -349,7 +347,6 @@ fn insert_card(
         .map_err(|e| format!("Failed to get connection: {:?}", e))?;
 
     let id = Uuid::new_v4().to_string();
-
     let result_card = conn.exec_drop(
         "INSERT INTO cards (id, deck_id, status, ease, `interval`, fails)
         VALUES (:id, :deck_id, :status, :ease, :interval, :fails)",
