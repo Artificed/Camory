@@ -36,3 +36,17 @@
 .theme-green {
     background-color: #CCF4B3;
 }
+
+.dayBox {
+    width: 13px;
+    height: 13px;
+    background-color: gainsboro;
+}
+
+.title {
+    @apply text-3xl justify-self-start font-bold;
+}
+
+.content {
+    @apply mt-16 p-4 pl-12 pr-12;
+}
