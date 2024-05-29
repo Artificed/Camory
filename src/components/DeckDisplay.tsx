@@ -8,9 +8,10 @@ interface Card {
     deck_id: string;
     status: string;
     ease: number;
-    interval: number;
-    due_in: number;
     fails: number;
+    streak: number;
+    review_time: Date;
+    due: Date;
 }
 
 interface Deck {
@@ -42,7 +43,7 @@ const DeckCard: React.FC<DeckCardProps> = ({ deck }) => {
     }
 
     const getDueCount = (deck : Deck) => {
-        return deck.cards.filter(card => card.status === 'due' && card.due_in === 0).length;
+        return deck.cards.filter(card => card.status === 'due').length;
     }
 
     const handlePlusButtonClick = (event: React.MouseEvent<HTMLImageElement>) => {

@@ -138,7 +138,7 @@ struct Card {
     ease: f32,
     fails: i16,
     streak: i16,
-    previous_due: NaiveDateTime,
+    review_time: NaiveDateTime,
     due: NaiveDateTime,
     content: Option<CardContent>,
 }
@@ -187,13 +187,13 @@ fn parse_naive_datetime(datetime_str: &str) -> NaiveDateTime {
 fn get_cards_for_deck(deck_id: String, mysql_pool: &State<Arc<Pool>>) -> Vec<Card> {
     let mut conn = mysql_pool.get_conn().expect("Failed to get connection");
     conn.exec_map(
-        "SELECT id, deck_id, status, ease, fails, streak, CAST(previous_due AS CHAR) AS previous_due, CAST(due AS CHAR) AS due
+        "SELECT id, deck_id, status, ease, fails, streak, CAST(review_time AS CHAR) AS review_time, CAST(due AS CHAR) AS due
          FROM cards
          WHERE deck_id = :deck_id",
         params! {
             "deck_id" => deck_id,
         },
-        |(id, deck_id, status, ease, fails, streak, previous_due, due): (
+        |(id, deck_id, status, ease, fails, streak, review_time, due): (
             String,
             String,
             String,
@@ -211,7 +211,7 @@ fn get_cards_for_deck(deck_id: String, mysql_pool: &State<Arc<Pool>>) -> Vec<Car
                 ease: ease as f32,
                 fails: fails as i16,
                 streak: streak as i16,
-                previous_due: parse_naive_datetime(&previous_due),
+                review_time: parse_naive_datetime(&review_time),
                 due: parse_naive_datetime(&due),
                 content,
             }
@@ -385,7 +385,7 @@ fn fail_learning_card(
         .map_err(|e| format!("Failed to get connection: {:?}", e))?;
     let result_card = conn.exec_drop(
         "UPDATE cards
-        SET status = 'learning', previous_due = CURRENT_TIMESTAMP, due = DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 1 MINUTE)
+        SET status = 'learning', review_time = CURRENT_TIMESTAMP, due = DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 1 MINUTE)
         WHERE id = :id",
         params! {
             "id" => card_id
@@ -407,7 +407,7 @@ fn pass_new_card(
         .map_err(|e| format!("Failed to get connection: {:?}", e))?;
     let result_card = conn.exec_drop(
         "UPDATE cards
-        SET status = 'learning', previous_due = CURRENT_TIMESTAMP, due = DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 10 MINUTE)
+        SET status = 'learning', review_time = CURRENT_TIMESTAMP, due = DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 10 MINUTE)
         WHERE id = :id",
         params! {
             "id" => card_id
@@ -419,6 +419,149 @@ fn pass_new_card(
     Ok(())
 }
 
+#[tauri::command]
+fn pass_learning_card(
+    card_id: String,
+    mysql_pool: State<Arc<Pool>>,
+) -> Result<(), String> {
+    let mut conn = mysql_pool
+        .get_conn()
+        .map_err(|e| format!("Failed to get connection: {:?}", e))?;
+    let result_card = conn.exec_drop(
+        "UPDATE cards
+        SET status =
+                CASE
+                    WHEN TIMESTAMPDIFF(MINUTE, review_time, due) = 60 THEN 'due'
+                    ELSE 'learning'
+                END,
+            due = 
+                CASE 
+                    WHEN TIMESTAMPDIFF(MINUTE, review_time, due) = 1 THEN DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 10 MINUTE)
+                    WHEN TIMESTAMPDIFF(MINUTE, review_time, due) = 10 THEN DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 60 MINUTE)
+                    WHEN TIMESTAMPDIFF(MINUTE, review_time, due) = 60 THEN DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 1 DAY)
+                    ELSE due
+                END,
+            review_time = CURRENT_TIMESTAMP
+        WHERE id = :id",
+        params! {
+            "id" => card_id
+        },
+    );
+    if let Err(e) = result_card {
+        return Err(format!("Failed to update card: {:?}", e));
+    }
+    Ok(())
+}
+
+#[tauri::command]
+fn pass_due_card(
+    card_id: String,
+    mysql_pool: State<Arc<Pool>>,
+) -> Result<(), String> {
+    let mut conn = mysql_pool
+        .get_conn()
+        .map_err(|e| format!("Failed to get connection: {:?}", e))?;
+    let result_card = conn.exec_drop(
+        "UPDATE cards
+        SET streak = streak + 1,
+            ease = 
+                CASE
+                    WHEN streak >= 3 AND ease != 2.5 THEN ROUND(ease + 0.05, 3)
+                    ELSE ease
+                END,
+            due = DATE_ADD(CURRENT_TIMESTAMP, INTERVAL ROUND(TIMESTAMPDIFF(SECOND, review_time, due) * ease) SECOND),
+            review_time = CURRENT_TIMESTAMP
+        WHERE id = :id",
+        params! {
+            "id" => card_id
+        },
+    );
+    if let Err(e) = result_card {
+        return Err(format!("Failed to update card: {:?}", e));
+    }
+    Ok(())
+}
+
+#[tauri::command]
+fn pass_relearning_card(
+    card_id: String,
+    mysql_pool: State<Arc<Pool>>,
+) -> Result<(), String> {
+    let mut conn = mysql_pool
+        .get_conn()
+        .map_err(|e| format!("Failed to get connection: {:?}", e))?;
+    let result_card = conn.exec_drop(
+        "UPDATE cards
+        SET streak = 
+                CASE 
+                    WHEN TIMESTAMPDIFF(MINUTE, review_time, due) = 60 THEN 1
+                    ELSE 0
+                END,
+            status = 
+                CASE
+                    WHEN TIMESTAMPDIFF(MINUTE, review_time, due) = 60 THEN 'due'
+                    ELSE 'relearning'
+                END,
+            due = 
+                CASE
+                    WHEN TIMESTAMPDIFF(MINUTE, review_time, due) = 10 THEN DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 60 MINUTE)
+                    WHEN TIMESTAMPDIFF(MINUTE, review_time, due) = 60 THEN DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 1 DAY)
+                    ELSE due
+                END,
+            review_time = CURRENT_TIMESTAMP
+        WHERE id = :id",
+        params! {
+            "id" => card_id
+        },
+    );
+    if let Err(e) = result_card {
+        return Err(format!("Failed to update card: {:?}", e));
+    }
+    Ok(())
+}
+
+#[tauri::command]
+fn fail_due_card(
+    card_id: String,
+    mysql_pool: State<Arc<Pool>>,
+) -> Result<(), String> {
+    let mut conn = mysql_pool
+        .get_conn()
+        .map_err(|e| format!("Failed to get connection: {:?}", e))?;
+    let result_card = conn.exec_drop(
+        "UPDATE cards
+        SET streak = 0,
+            fails = 
+                CASE
+                    WHEN status = 'due' THEN fails + 1
+                    ELSE fails
+                END,
+            ease = 
+                CASE
+                    WHEN ease != 1.3 THEN ROUND(ease - 0.20, 3)
+                    ELSE ease
+                END,
+            status = 
+                CASE
+                    WHEN fails = 6 THEN 'suspended'
+                    ELSE 'relearning'
+                END,
+            due = 
+                CASE 
+                    WHEN status = 'suspended' THEN '2000-01-01 00:00:00'
+                    ELSE DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 10 MINUTE)
+                END,
+            review_time = CURRENT_TIMESTAMP
+        WHERE id = :id",
+        params! {
+            "id" => card_id
+        },
+    );
+    if let Err(e) = result_card {
+        return Err(format!("Failed to update card: {:?}", e));
+    }
+    Ok(())
+}
 
 fn main() {
     let mysql_config = MySQLConfig::new(
@@ -451,6 +594,10 @@ fn main() {
             get_deck_by_id,
             fail_learning_card,
             pass_new_card,
+            pass_learning_card,
+            pass_due_card,
+            pass_relearning_card,
+            fail_due_card
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

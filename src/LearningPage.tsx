@@ -2,8 +2,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api";
-import CardFront from "./components/CardFront";
-import CardBack from "./components/CardBack";
+import CardDisplay from "./components/CardDisplay"
 
 interface Deck {
     id: string;
@@ -18,9 +17,10 @@ interface Card {
     deck_id: string;
     status: string;
     ease: number;
-    interval: number;
-    due_in: number; 
     fails: number;
+    streak: number;
+    review_time: Date;
+    due: Date;
     content?: CardContent;
 }
 
@@ -79,62 +79,61 @@ function LearningPage() {
     };
 
     const handleFail = async (cards: Card[]) => {
-        if(cards[currentIndex].status === 'new') {
-            console.log('test')
-            try {
+        try {
+            if(cards[currentIndex].status === 'new' || cards[currentIndex].status === 'learning') {
                 await invoke('fail_learning_card', { 
                     cardId: cards[currentIndex].id,
                 });
-            } catch (error) {
-                console.error("Error retrieving decks:", error);
+            } else if(cards[currentIndex].status === 'due' || cards[currentIndex].status === 'relearning') {
+                await invoke('fail_due_card', { 
+                    cardId: cards[currentIndex].id,
+                });
             }
+        } catch (error) {
+            console.error("Error retrieving decks:", error);
         }
         nextCard(cards);
     };
 
     const handlePass = async (cards: Card[]) => {
-        if(cards[currentIndex].status === 'new') {
-            try {
+        try {
+            if(cards[currentIndex].status === 'new') {
                 await invoke('pass_new_card', { 
                     cardId: cards[currentIndex].id,
-                });
-            } catch (error) {
-                console.error("Error retrieving decks:", error);
+                }); 
+            } else if (cards[currentIndex].status === 'learning') {
+                await invoke('pass_learning_card', { 
+                    cardId: cards[currentIndex].id,
+                }); 
+            } else if (cards[currentIndex].status === 'due') {
+                await invoke('pass_due_card', { 
+                    cardId: cards[currentIndex].id,
+                }); 
+            } else if (cards[currentIndex].status === 'relearning') {
+                await invoke('pass_relearning_card', { 
+                    cardId: cards[currentIndex].id,
+                }); 
             }
+        } catch (error) {
+            console.error("Error retrieving decks:", error);
         }
         nextCard(cards);
     };
+
+    const currentCardSet = dueCards;
 
     return (
         <div>
             <Navbar />
             <div>
-                <div className="absolute mt-60">
-                    {newCards.length}
-                    {learningCards.length}
-                    {dueCards.length}
-                    {deck?.cards.length}
-                </div>
-                {newCards.length > 0 && (
-                    <>
-                        {showFront ? (
-                            <CardFront
-                                vocabulary={newCards[currentIndex]?.content?.vocabulary || ""}
-                                clue={newCards[currentIndex]?.content?.clue || ""}
-                                onShowAnswer={handleShowAnswer}
-                            />
-                        ) : (
-                            <CardBack
-                                vocabulary={newCards[currentIndex]?.content?.vocabulary || ""}
-                                clue={newCards[currentIndex]?.content?.clue || ""}
-                                asset={newCards[currentIndex]?.content?.asset || ""}
-                                definition={newCards[currentIndex]?.content?.definition || ""}
-                                description={newCards[currentIndex]?.content?.description || ""}
-                                onPass={() => handlePass(newCards)}
-                                onFail={() => handleFail(newCards)}
-                            />
-                        )}
-                    </>
+                {currentCardSet.length > 0 && (
+                    <CardDisplay
+                        card={currentCardSet[currentIndex]}
+                        onShowAnswer={handleShowAnswer}
+                        onPass={() => handlePass(currentCardSet)}
+                        onFail={() => handleFail(currentCardSet)}
+                        showFront={showFront}
+                    />
                 )}
             </div>
         </div>
