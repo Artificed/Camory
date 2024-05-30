@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "./components/Navbar";
 import Button from "./components/Button";
 import logo from './assets/logo.png';
 import { invoke } from '@tauri-apps/api';
