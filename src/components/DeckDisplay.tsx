@@ -43,7 +43,11 @@ const DeckCard: React.FC<DeckCardProps> = ({ deck }) => {
     }
 
     const getDueCount = (deck : Deck) => {
-        return deck.cards.filter(card => card.status === 'due').length;
+        return deck.cards.filter(card => card.status === 'due' && new Date(card.due) < new Date()).length;
+    }
+
+    const getSuspendedCount = (deck : Deck) => {
+        return deck.cards.filter(card => card.status === 'suspended').length;
     }
 
     const handlePlusButtonClick = (event: React.MouseEvent<HTMLImageElement>) => {
@@ -69,7 +73,8 @@ const DeckCard: React.FC<DeckCardProps> = ({ deck }) => {
                     <p className="text-gray-600 text-xs mr-8">New: {getNewCount(deck)}</p>
                     <p className="text-gray-600 text-xs mr-8">Learning: {getLearnCount(deck)}</p>
                     <p className="text-gray-600 text-xs mr-8">Relearning: {getRelearningCount(deck)}</p>
-                    <p className="text-gray-600 text-xs">Due: {getDueCount(deck)}</p>
+                    <p className="text-gray-600 text-xs mr-8">Due: {getDueCount(deck)}</p>
+                    <p className="text-gray-600 text-xs">Suspended: {getSuspendedCount(deck)}</p>
                 </div>
                 <div className="flex justify-end">
                     <p className="text-gray-600 text-xs">Total cards: {deck.cards.length}</p>
