@@ -34,7 +34,7 @@ CREATE TABLE cards (
     fails INT NOT NULL DEFAULT 0,
     streak INT NOT NULL DEFAULT 0,
     previous_due TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
-    due TIMESTAMP DEFAULT NOT NULL '2000-01-01 00:00:00',
+    due TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
     FOREIGN KEY (deck_id) REFERENCES decks(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -43,7 +43,7 @@ VALUES
 ('02f79881-6764-4e6f-82ba-ef1ac91d6e28', '018f8c8e-88df-7651-82e0-eae84b90def6', 'new'),
 ('0fb2e9b6-5b66-4964-ace2-a58f075716b7', '018f8c8e-88df-7651-82e0-eae84b90def6', 'new'),
 ('43a5fba8-1ae2-43b4-82b2-934e4c933b89', '018f8c8e-88df-7651-82e0-eae84b90def6', 'new'),
-('982b37d9-aa88-415d-8be2-6bfab531f0ac', '018f8c8e-88df-7651-82e0-eae84b90def6', 'new')
+('982b37d9-aa88-415d-8be2-6bfab531f0ac', '018f8c8e-88df-7651-82e0-eae84b90def6', 'new'),
 ('e50a5d2f-6ea1-4c50-8b1b-a7e2a46479a9', '018f8c8e-88df-7651-82e0-eae84b90def6', 'new');
 
 CREATE TABLE card_contents(

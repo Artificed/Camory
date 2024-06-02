@@ -60,3 +60,91 @@ body {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
+
+
+
+.burgerMenu {
+    margin: 5px 12px;
+    height: 36px;
+    width: 36px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    cursor: pointer;
+    z-index: 200;
+}
+
+.burgerBar{
+    width: 24px;
+    height: 2px;
+    border-radius: 1px;
+    background-color: black;
+    transition: 0.5s ease-out;
+}
+
+.menu {
+    width: 20vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: -22vw;
+    background-color: whitesmoke;
+    box-shadow: 0.4rem 0rem 1rem rgb(164, 162, 162) ;
+    z-index: 100;
+    transition: 0.5s ease-in-out;
+}
+
+.menu ul {
+    text-align: left;
+    padding: 4rem 0rem;
+}
+
+.menu li {
+    font-size: 1rem;
+    padding: 1rem;
+    margin: 0.5rem 0.8rem;
+    width: 86%;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.invisibleWrapper {
+    position: absolute;
+    width: 80vw;
+    height: 100vw;
+    top: 0;
+    right: 0;
+    display: none;
+}
+
+.menu li:hover {
+    background-color: rgb(231, 229, 229);
+    transition: 0.3s ease-out;
+}
+
+.menu.active {
+    left: 0%;
+}
+
+.burgerBar.clicked:nth-child(1){
+    transform: translate(0px, 10px);
+}
+
+.burgerBar.clicked:nth-child(3){
+    transform: translate(0px, -10px);
+}
+
+.burgerBar.unclicked:nth-child(1){
+    transform: translate(0px, 0px);
+}
+
+.burgerBar.unclicked:nth-child(3){
+    transform: translate(0px, 0px);
+}
+
+.invisibleWrapper.active {
+    display: inherit;
+}
