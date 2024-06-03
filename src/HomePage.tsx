@@ -18,9 +18,10 @@ interface Card {
     deck_id: string;
     status: string;
     ease: number;
-    interval: number;
-    due_in: number; 
     fails: number;
+    streak: number;
+    review_time: Date;
+    due: Date;
     content?: CardContent;
 }
 
