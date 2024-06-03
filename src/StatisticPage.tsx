@@ -67,17 +67,17 @@ function ProfilePage() {
         <div>
             <Navbar />
             <div className="content">
-                <div className="flex justify-start mb-6">
+                <div className="flex justify-start mb-6 mt-4">
                     <h1 className="title">Statistic</h1>
                 </div>
                 <div className="grid grid-cols-3 mt-4 mb-4 gap-4">
-                    <div className="col-span-2 p-6 pt-10 border-2 border-slate-500 rounded-md flex flex-col justify-center">
+                    <div className="col-span-2 p-6 pt-10 shadow-md border-2 border-slate-400 rounded-md flex flex-col justify-center">
                         <img src="./src/assets/graph_example.png" alt="Review Graph" className='h-48 object-fill border-b-2 border-slate-300'/>
                         <p className='text-center mt-2'>Review Interval</p>
                     </div>
                     <div className="p-6 text-sm">
                         <ul>
-                            <h3 className="mb-2">Card Statistics</h3>
+                            <h3 className="mb-2 font-semibold">Card Statistics</h3>
                             <li className="mb-1">
                                 <div className="w-3 h-3 bg-[#FBC1B9] inline-block mr-2"></div>
                                 <div className="inline-block">New: </div>
@@ -107,7 +107,7 @@ function ProfilePage() {
                 </div>  
 
 
-                <h2 className="text-lg mb-2">Activity</h2>
+                <h2 className="text-lg mb-2 mt-6">Activity</h2>
                 <div className="flex flex-row text-xs text-gray-500">
                     <div className="text-right">
                         <div className="text-xs mt-4 mr-1.5">Sun</div>
@@ -120,7 +120,7 @@ function ProfilePage() {
                     </div>
                 </div>
                 
-                <Button text="Back" className="mt-8 bg-[#B9F1FF]" onclick={handleProfileClick}></Button>
+                <Button text="Back" className="mt-8 bg-[#B9F1FF] hover:bg-[#a1e1f1]" onclick={handleProfileClick}></Button>
                 
             </div>
 

@@ -64,7 +64,7 @@ function CreateDeckPage() {
             <div className="flex items-center">
                 <img src={logo} className="h-36 mr-3 hover:cursor-pointer" onClick={handleLogoClick}/>
                 <form onSubmit={handleSubmit} className="flex flex-col items-center justify-center ml-3">
-                    <input type="text" value={deckName} className="p-4 w-72 text-lg text-blue-950 rounded-xl border transition-colors hover:bg-slate-100" 
+                    <input type="text" value={deckName} className="p-4 w-72 text-lg text-blue-950 rounded-xl border transition-colors hover:bg-slate-100 active:bg-slate-100" 
                     onChange={(e) => setDeckName(e.target.value)} placeholder="Your deck name"/>
                     <div className="flex justify-start w-72 translate-x-1">
                         {errorMessage && <p className="text-red-500 mt-2 text-sm">{errorMessage}</p>}

@@ -39,7 +39,7 @@ function Navbar() {
     };
 
     const handleLogoutClick = () => {
-        navigate("/home");
+        navigate("/");
     };
 
     return (
