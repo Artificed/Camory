@@ -60,7 +60,7 @@ const DeckCard: React.FC<DeckCardProps> = ({ deck }) => {
     };
     
     return (
-        <div className="px-6 py-4 mb-4 rounded-lg theme-blue-light" onClick={handleDeckClick}>
+        <div className="px-6 py-4 mb-4 rounded-lg theme-blue-light transition-transform hover:scale-105 hover:shadow-md" onClick={handleDeckClick}>
             <div className="grid grid-cols-2">
                 <p>{deck.name}</p>
                 <div className="flex justify-end translate-y-1">

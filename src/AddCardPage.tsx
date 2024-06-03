@@ -12,6 +12,7 @@ function AddCardPage() {
     const navigate = useNavigate();
 
     const [pageNumber, setPageNumber] = useState(1);
+    const [pageInfo, setPageInfo] = useState("Front card");
 
     const [vocabulary, setVocabulary] = useState<string>("");
     const [clue, setClue] = useState<string>("");
@@ -26,11 +27,13 @@ function AddCardPage() {
     const [errorMessage, setErrorMessage] = useState<string>("");
 
     const handleArrowBack = () => {
-        setPageNumber(1)
+        setPageNumber(1);
+        setPageInfo("Front card");
     }
 
     const handleArrowFront = () => {
         setPageNumber(2)
+        setPageInfo("Back card");
     }
 
     const handleSubmit = async () => {
@@ -92,17 +95,17 @@ function AddCardPage() {
                 <div className="flex flex-col items-center">
                     <div className="flex justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
-                        strokeWidth={4} stroke="currentColor" className="size-6" onClick={handleArrowBack}>
+                        strokeWidth={4} stroke="currentColor" className="size-9 hover:bg-slate-300 p-2 rounded-xl" onClick={handleArrowBack}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                         </svg>
-                        <p className="mx-8">{pageNumber}</p>
+                        <p className="mx-8 my-[0.4rem]">{pageInfo}</p>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
-                        strokeWidth={4} stroke="currentColor" className="size-6" onClick={handleArrowFront}>
+                        strokeWidth={4} stroke="currentColor" className="size-9 hover:bg-slate-300 p-2 rounded-xl" onClick={handleArrowFront}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                         </svg>
                     </div>
                     {pageNumber === 2 && (
-                        <Button text='Submit' className='bright-red absolute translate-y-20' onclick={handleSubmit}/>
+                        <Button text='Submit' className='bright-red absolute translate-y-20 hover:bg-[#edaa92]' onclick={handleSubmit}/>
                     )}
                     {errorMessage && <p className="text-red-500 translate-y-4 text-sm">{errorMessage}</p>}
                 </div>

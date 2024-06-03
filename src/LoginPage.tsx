@@ -39,20 +39,20 @@ function LoginPage() {
             <img src={logo} className='mb-5 hover:cursor-pointer' onClick={handleLogoClick}/>
 
             <form onSubmit={handleSubmit} 
-                className='theme-brown-light w-2/5 h-1/2 border border-gray-400 
+                className='theme-brown-light w-2/5 h-1/2 border border-[#E3DAC7ff]
                 flex flex-col items-center rounded-2xl p-8'>
 
                 <p className="text-2xl mt-4">Login</p>
 
-                <input type="text" name="username" value={username} className="mt-8 p-2 w-5/6 rounded-lg border-b-2" 
+                <input type="text" name="username" value={username} className="mt-8 px-3 py-2 w-5/6 rounded-lg border-b-2 hover:bg-[#f3ecdf] active:bg-[#f3ecdf]" 
                 onChange={(e) => setUsername(e.target.value)} placeholder="Username"/>
 
-                <input type="password" name="password" value={password} className="mt-8 w-5/6 p-2 rounded-lg border-b-2" 
+                <input type="password" name="password" value={password} className="mt-8 w-5/6 px-3 py-2 rounded-lg border-b-2 transition-colors hover:bg-[#f3ecdf] active:bg-[#f3ecdf]" 
                 onChange={(e) => setPassword(e.target.value)} placeholder="Password"/>
 
                 {errorMessage && <p className="text-red-500 absolute mt-56">{errorMessage}</p>}
 
-                <Button text="Login" className="theme-brown-dark mt-16" />
+                <Button text="Login" className="theme-brown-dark mt-16 hover:bg-[#deceac]" />
             </form>
         </div>
     );
