@@ -83,11 +83,11 @@ function HomePage() {
             <Navbar />
             <div className="mt-16 flex flex-col items-center hide-scrollbar">
                 <form action="" className="flex justify-center w-5/6">
-                    <input type="text" name="" id="" className="theme-brown-medium rounded-lg w-2/3 h-12 mt-10 mr-3 p-3" placeholder="Enter Deck Name"/>
-                    <Button text="Search" className="p-3 bright-red w-24 mt-10 ml-3 text-sm border-none"/>
+                    <input type="text" name="" id="" className="bg-[#FAF6EE] rounded-lg w-full h-12 mt-10 mr-3 p-5 text-md transition ease-linear duration-300 hover:bg-[#f2eadb]" placeholder="Enter Deck Name"/>
+                    <Button text="Search" className="p-3 bright-red w-24 mt-10 ml-3 text-sm border-none hover:bg-[#edaa92]"/>
                 </form>
                 <div className="flex justify-start w-5/6 my-5">
-                    <Button text="+ Create Deck" className="w-36 h-8 text-xs theme-green" onclick={handleCreateDeckClick}/>
+                    <Button text="+ Create Deck" className="w-36 h-10 text-sm theme-green hover:bg-[#aee78a]" onclick={handleCreateDeckClick}/>
                 </div>
                 {user ? (
                     <div className="w-5/6">

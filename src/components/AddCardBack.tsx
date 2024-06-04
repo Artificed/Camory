@@ -45,13 +45,13 @@ function AddCardBack({ asset, setAsset, preview, setPreview, definition, setDefi
             <hr className="w-5/6 my-8 border border-opacity-50 border-orange-400" />
             <textarea 
                 value={definition} 
-                className="w-full h-24 text-2xl text-blue-950 rounded-xl font-extrabold px-12 focus:outline-none resize-none" 
+                className="w-full h-24 text-2xl text-blue-950 rounded-xl font-extrabold px-12 focus:outline-none resize-none focus:placeholder-transparent" 
                 onChange={(e) => setDefinition(e.target.value)} 
                 placeholder="Definition"
             />
             <textarea 
                 value={description} 
-                className="w-full h-20 text-blue-950 rounded-xl focus:outline-none px-12 mt-5 resize-none" 
+                className="w-full h-20 text-blue-950 rounded-xl focus:outline-none px-12 mt-5 resize-none focus:placeholder-transparent" 
                 onChange={(e) => setDescription(e.target.value)} 
                 placeholder="Description"
             />
