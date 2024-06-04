@@ -3,44 +3,17 @@ import { useParams } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import { invoke } from '@tauri-apps/api';
 import CardDisplay from './components/CardDisplay';
-
-interface Deck {
-    id: string;
-    name: string;
-    user_id: string;
-    new_cards_per_day: number;
-    cards: Card[];
-}
-
-interface Card {
-    id: string;
-    deck_id: string;
-    status: string;
-    ease: number;
-    fails: number;
-    streak: number;
-    review_time: Date;
-    due: Date;
-    content?: CardContent;
-}
-
-interface CardContent {
-    card_id: string;
-    vocabulary: string;
-    clue: string;
-    asset: string;
-    definition: string;
-    description: string;
-}
+import UserCard from './models/UserCard';
+import Deck from './models/Deck';
 
 function LearningPage() {
     
     const params = useParams();
     const [showFront, setShowFront] = useState(true);
 
-    const [newCards, setNewCards] = useState<Card[]>([]);
-    const [dueCards, setDueCards] = useState<Card[]>([]);
-    const [redCards, setRedCards] = useState<Card[]>([]); // Learning + Relearning Cards
+    const [newCards, setNewCards] = useState<UserCard[]>([]);
+    const [dueCards, setDueCards] = useState<UserCard[]>([]);
+    const [redCards, setRedCards] = useState<UserCard[]>([]); // Learning + Relearning Cards
 
     const fetchDeck = async () => {
         try {
@@ -67,7 +40,7 @@ function LearningPage() {
         setShowFront(true);
     };
 
-    const handleFail = async (card: Card) => {
+    const handleFail = async (card: UserCard) => {
         try {
             if (card.status === 'new' || card.status === 'learning') {
                 await invoke('fail_learning_card', { cardId: card.id });
@@ -81,7 +54,7 @@ function LearningPage() {
         nextCard();
     };
 
-    const handlePass = async (card: Card) => {
+    const handlePass = async (card: UserCard) => {
         try {
             if (card.status === 'new') {
                 await invoke('pass_new_card', { cardId: card.id });
@@ -99,7 +72,7 @@ function LearningPage() {
         nextCard();
     };
 
-    const getCurrentCardSet = (): Card[] => {
+    const getCurrentCardSet = (): UserCard[] => {
         if (dueCards.length > 0) {
             return dueCards;
         } else if (newCards.length > 0) {

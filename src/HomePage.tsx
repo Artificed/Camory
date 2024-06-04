@@ -31,17 +31,7 @@ function HomePage() {
         const fetchDecks = async (userId: string) => {
             try {
                 const result = await invoke<Deck[]>("get_decks", { userId });
-
                 setDecks(result);
-
-                //
-                decks.forEach(deck => {
-                    deck.cards.forEach(card => {
-                        console.log(card)
-                    });
-                });
-                //
-
             } catch (error) {
                 console.error("Error retrieving decks:", error);
             }

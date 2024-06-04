@@ -1,9 +1,6 @@
-import hamburger from '../assets/hamburger.png';
 import logo from '../assets/logo.png';
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { CgProfile } from "react-icons/cg";
-import { IoIosLogOut } from "react-icons/io";
 
 function Navbar() {
     const [burger_class, setBurgerClass] = useState("unclicked");

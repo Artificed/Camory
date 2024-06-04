@@ -1,29 +1,9 @@
 import CardBack from "./CardBack";
 import CardFront from "./CardFront";
-
-interface Card {
-    id: string;
-    deck_id: string;
-    status: string;
-    ease: number;
-    fails: number;
-    streak: number;
-    review_time: Date;
-    due: Date;
-    content?: CardContent;
-}
-
-interface CardContent {
-    card_id: string;
-    vocabulary: string;
-    clue: string;
-    asset: string;
-    definition: string;
-    description: string;
-}
+import UserCard from "../models/UserCard";
 
 interface CardDisplayProps {
-    card: Card;
+    card: UserCard;
     onShowAnswer: () => void;
     onPass: () => void;
     onFail: () => void;

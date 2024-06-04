@@ -2,25 +2,7 @@ import React from 'react';
 import settings_img from '../assets/settings.png'
 import plus_img from '../assets/plus.png'
 import { useNavigate } from 'react-router-dom';
-
-interface Card {
-    id: string;
-    deck_id: string;
-    status: string;
-    ease: number;
-    fails: number;
-    streak: number;
-    review_time: Date;
-    due: Date;
-}
-
-interface Deck {
-    id: string;
-    name: string;
-    user_id: string;
-    new_cards_per_day: number;
-    cards: Card[];
-}
+import Deck from '../models/Deck';
 
 interface DeckCardProps {
     deck: Deck;
