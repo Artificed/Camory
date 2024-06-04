@@ -3,13 +3,7 @@ import { invoke } from '@tauri-apps/api';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Button from './components/Button';
-
-interface User {
-    id: string;
-    email: string;
-    password: string;
-    username: string;
-}
+import User from './models/User';
 
 function ProfilePage() {
     const navigate = useNavigate();

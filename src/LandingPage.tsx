@@ -1,4 +1,3 @@
-import home_bg from './assets/home_bg.png'
 import Button from './components/Button';
 import { useNavigate } from "react-router-dom";
 import logo from './assets/logo_big.png';

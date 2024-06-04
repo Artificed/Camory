@@ -127,41 +127,42 @@ struct Deck {
     name: String,
     user_id: String,
     new_cards_per_day: i16,
-    cards: Vec<Card>,
+    cards: Vec<UserCard>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
 struct Card {
     id: String,
+    vocabulary: String,
+    clue: String,
+    asset: String,
+    definition: String,
+    description: String, 
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+struct UserCard {
+    id: String,
     deck_id: String,
+    card_id: String,
     status: String,
     ease: f32,
     fails: i16,
     streak: i16,
     review_time: NaiveDateTime,
     due: NaiveDateTime,
-    content: Option<CardContent>,
-}
-
-#[derive(Serialize, Deserialize, Clone)]
-struct CardContent {
-    card_id: String,
-    vocabulary: String,
-    clue: String,
-    asset: String,
-    definition: String,
-    description: String,
+    content: Option<Card>,
 }
 
 #[tauri::command]
-fn get_card_content(card_id: String, mysql_pool: &State<Arc<Pool>>) -> Option<CardContent> {
+fn get_card_content(card_id: String, mysql_pool: &State<Arc<Pool>>) -> Option<Card> {
     let mut conn = mysql_pool.get_conn().expect("Failed to get connection");
 
     let result: Option<(String, String, String, String, String, String)> = conn
         .exec_first(
-            "SELECT card_id, vocabulary, clue, asset, definition, description
-             FROM card_contents
-             WHERE card_id = :card_id",
+            "SELECT id, vocabulary, clue, asset, definition, description
+             FROM cards
+             WHERE id = :card_id",
             params! {
                 "card_id" => card_id,
             },
@@ -169,8 +170,8 @@ fn get_card_content(card_id: String, mysql_pool: &State<Arc<Pool>>) -> Option<Ca
         .expect("Failed to execute query");
 
     result.map(
-        |(card_id, vocabulary, clue, asset, definition, description)| CardContent {
-            card_id,
+        |(id, vocabulary, clue, asset, definition, description)| Card {
+            id,
             vocabulary,
             clue,
             asset,
@@ -184,16 +185,17 @@ fn parse_naive_datetime(datetime_str: &str) -> NaiveDateTime {
     NaiveDateTime::parse_from_str(datetime_str, "%Y-%m-%d %H:%M:%S").expect("Failed to parse date")
 }
 
-fn get_cards_for_deck(deck_id: String, mysql_pool: &State<Arc<Pool>>) -> Vec<Card> {
+fn get_user_cards_for_deck(deck_id: String, mysql_pool: &State<Arc<Pool>>) -> Vec<UserCard> {
     let mut conn = mysql_pool.get_conn().expect("Failed to get connection");
     conn.exec_map(
-        "SELECT id, deck_id, status, ease, fails, streak, CAST(review_time AS CHAR) AS review_time, CAST(due AS CHAR) AS due
-         FROM cards
+        "SELECT id, deck_id, card_id, status, ease, fails, streak, CAST(review_time AS CHAR) AS review_time, CAST(due AS CHAR) AS due
+         FROM user_cards
          WHERE deck_id = :deck_id",
         params! {
             "deck_id" => deck_id,
         },
-        |(id, deck_id, status, ease, fails, streak, review_time, due): (
+        |(id, deck_id, card_id, status, ease, fails, streak, review_time, due): (
+            String,
             String,
             String,
             String,
@@ -203,10 +205,11 @@ fn get_cards_for_deck(deck_id: String, mysql_pool: &State<Arc<Pool>>) -> Vec<Car
             String,
             String,
         )| {
-            let content = get_card_content(id.clone(), mysql_pool);
-            Card {
+            let content: Option<Card> = get_card_content(card_id.clone(), mysql_pool);
+            UserCard {
                 id,
                 deck_id,
+                card_id,
                 status,
                 ease: ease as f32,
                 fails: fails as i16,
@@ -232,7 +235,7 @@ fn get_deck_by_id(deck_id: String, mysql_pool: State<Arc<Pool>>) -> Option<Deck>
         },
     ).expect("Failed to execute query");
     result.map(|(id, user_id, name, new_cards_per_day)| {
-        let cards = get_cards_for_deck(id.clone(), &mysql_pool);
+        let cards = get_user_cards_for_deck(id.clone(), &mysql_pool);
         Deck {
             id,
             user_id,
@@ -256,7 +259,7 @@ fn get_decks(user_id: String, mysql_pool: State<Arc<Pool>>) -> Vec<Deck> {
             },
             |(id, user_id, name, new_cards_per_day): (String, String, String, i16)| {
                 let id_clone = id.clone(); // Clone the id value
-                let cards = get_cards_for_deck(id_clone, &mysql_pool); // Fetch cards for the current deck
+                let cards = get_user_cards_for_deck(id_clone, &mysql_pool); // Fetch cards for the current deck
                 Deck {
                     id,
                     user_id,
@@ -306,24 +309,25 @@ fn create_deck(
     }
 }
 
-#[tauri::command]
-fn insert_card_content(
-    card_id: String,
+fn insert_card(
     vocabulary: String,
     clue: String,
     asset: String, // The asset is a base64 encoded string
     definition: String,
     description: String,
     mysql_pool: State<Arc<Pool>>,
-) -> Result<(), String> {
+) -> Result<String, String> {
     let mut conn = mysql_pool
         .get_conn()
         .map_err(|e| format!("Failed to get connection: {:?}", e))?;
+
+    let id = Uuid::new_v4().to_string();
+
     let result = conn.exec_drop(
-        "INSERT INTO card_contents (card_id, vocabulary, clue, asset, definition, description)
-        VALUES (:card_id, :vocabulary, :clue, :asset, :definition, :description)",
+        "INSERT INTO cards (id, vocabulary, clue, asset, definition, description)
+        VALUES (:id, :vocabulary, :clue, :asset, :definition, :description)",
         params! {
-            "card_id" => &card_id,
+            "id" => &id,
             "vocabulary" => vocabulary,
             "clue" => clue,
             "asset" => asset,
@@ -336,11 +340,11 @@ fn insert_card_content(
         return Err(format!("Failed to insert into card contents: {:?}", e));
     }
 
-    Ok(())
+    Ok(id)
 }
 
 #[tauri::command]
-fn insert_card(
+fn insert_user_card(
     deck_id: String,
     vocabulary: String,
     clue: String,
@@ -354,22 +358,25 @@ fn insert_card(
         .map_err(|e| format!("Failed to get connection: {:?}", e))?;
 
     let id = Uuid::new_v4().to_string();
+
+    let card_id = match insert_card(vocabulary, clue, asset, definition, description, mysql_pool) {
+        Ok(card_id) => card_id,
+        Err(e) => return Err(e),
+    };
+
     let result_card = conn.exec_drop(
-        "INSERT INTO cards (id, deck_id, status)
-        VALUES (:id, :deck_id, :status)",
+        "INSERT INTO user_cards (id, deck_id, card_id, status)
+        VALUES (:id, :deck_id, :card_id, :status)",
         params! {
             "id" => &id,
             "deck_id" => deck_id,
-            "status" => "new"
+            "card_id" => &card_id,
+            "status" => "new",
         },
     );
 
     if let Err(e) = result_card {
         return Err(format!("Failed to insert into cards: {:?}", e));
-    }
-
-    if let Err(e) = insert_card_content(id, vocabulary, clue, asset, definition, description, mysql_pool) {
-        return Err(format!("Failed to insert into card content: {:?}", e));
     }
 
     Ok(())
@@ -384,7 +391,7 @@ fn fail_learning_card(
         .get_conn()
         .map_err(|e| format!("Failed to get connection: {:?}", e))?;
     let result_card = conn.exec_drop(
-        "UPDATE cards
+        "UPDATE user_cards
         SET status = 'learning', review_time = CURRENT_TIMESTAMP, due = DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 1 MINUTE)
         WHERE id = :id",
         params! {
@@ -406,7 +413,7 @@ fn pass_new_card(
         .get_conn()
         .map_err(|e| format!("Failed to get connection: {:?}", e))?;
     let result_card = conn.exec_drop(
-        "UPDATE cards
+        "UPDATE user_cards
         SET status = 'learning', review_time = CURRENT_TIMESTAMP, due = DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 10 MINUTE)
         WHERE id = :id",
         params! {
@@ -428,7 +435,7 @@ fn pass_learning_card(
         .get_conn()
         .map_err(|e| format!("Failed to get connection: {:?}", e))?;
     let result_card = conn.exec_drop(
-        "UPDATE cards
+        "UPDATE user_cards
         SET status =
                 CASE
                     WHEN TIMESTAMPDIFF(MINUTE, review_time, due) = 60 THEN 'due'
@@ -462,7 +469,7 @@ fn pass_due_card(
         .get_conn()
         .map_err(|e| format!("Failed to get connection: {:?}", e))?;
     let result_card = conn.exec_drop(
-        "UPDATE cards
+        "UPDATE user_cards
         SET streak = streak + 1,
             ease = 
                 CASE
@@ -491,7 +498,7 @@ fn pass_relearning_card(
         .get_conn()
         .map_err(|e| format!("Failed to get connection: {:?}", e))?;
     let result_card = conn.exec_drop(
-        "UPDATE cards
+        "UPDATE user_cards
         SET streak = 
                 CASE 
                     WHEN TIMESTAMPDIFF(MINUTE, review_time, due) = 60 THEN 1
@@ -529,7 +536,7 @@ fn fail_due_card(
         .get_conn()
         .map_err(|e| format!("Failed to get connection: {:?}", e))?;
     let result_card = conn.exec_drop(
-        "UPDATE cards
+        "UPDATE user_cards
         SET streak = 0,
             fails = 
                 CASE
@@ -589,8 +596,7 @@ fn main() {
             get_current_user,
             get_decks,
             create_deck,
-            insert_card_content,
-            insert_card,
+            insert_user_card,
             get_deck_by_id,
             fail_learning_card,
             pass_new_card,

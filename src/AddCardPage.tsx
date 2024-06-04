@@ -61,7 +61,7 @@ function AddCardPage() {
             const base64String = btoa(String.fromCharCode(...uint8Array));
             const temp = params.deck_id;
             try {
-                await invoke('insert_card', { 
+                await invoke('insert_user_card', { 
                     deckId: temp, 
                     vocabulary, 
                     clue, 

@@ -4,42 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Button from './components/Button';
 import DeckDisplay from './components/DeckDisplay';
-
-interface Deck {
-    id: string;
-    name: string;
-    user_id: string;
-    new_cards_per_day: number;
-    cards: Card[];
-}
-
-interface Card {
-    id: string;
-    deck_id: string;
-    status: string;
-    ease: number;
-    fails: number;
-    streak: number;
-    review_time: Date;
-    due: Date;
-    content?: CardContent;
-}
-
-interface CardContent {
-    card_id: string;
-    vocabulary: string;
-    clue: string;
-    asset: string;
-    definition: string;
-    description: string;
-}
-
-interface User {
-    id: string;
-    email: string;
-    password: string;
-    username: string;
-}
+import User from './models/User';
+import Deck from './models/Deck';
 
 function HomePage() {
     const navigate = useNavigate();
@@ -65,7 +31,17 @@ function HomePage() {
         const fetchDecks = async (userId: string) => {
             try {
                 const result = await invoke<Deck[]>("get_decks", { userId });
+
                 setDecks(result);
+
+                //
+                decks.forEach(deck => {
+                    deck.cards.forEach(card => {
+                        console.log(card)
+                    });
+                });
+                //
+
             } catch (error) {
                 console.error("Error retrieving decks:", error);
             }

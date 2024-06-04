@@ -4,13 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import logo from './assets/logo_big.png';
 import Button from './components/Button';
 import create_deck from './assets/create_deck.png';
-
-interface User {
-    id: string;
-    email: string;
-    password: string;
-    username: string;
-}
+import User from './models/User';
 
 function CreateDeckPage() {
 
