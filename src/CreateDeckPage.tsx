@@ -16,16 +16,13 @@ function CreateDeckPage() {
 
     const navigate = useNavigate();
     const [deckName, setDeckName] = useState("");
-    const [user, setUser] = useState<User | null>(null);
     const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
         const fetchCurrentUser = async () => {
             try {
                 const result = await invoke<User | null>("get_current_user");
-                if (result) {
-                    setUser(result);
-                } else {
+                if (!result) {
                     navigate('/login');
                 }
             } catch (error) {

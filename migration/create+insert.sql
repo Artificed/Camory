@@ -15,7 +15,7 @@ VALUES
 
 CREATE TABLE decks (
     id CHAR(36) PRIMARY KEY NOT NULL,
-    user_id CHAR(36),
+    user_id CHAR(36) NOT NULL ,
     name VARCHAR(255) NOT NULL,
     new_cards_per_day INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE
@@ -53,7 +53,7 @@ CREATE TABLE card_contents(
     asset LONGTEXT,
     definition VARCHAR(255) NOT NULL,
     description VARCHAR(255) NOT NULL,
-    FOREIGN KEY (card_id) REFERENCES cards(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (card_id) REFERENCES cards(id) ON UPDATE CASCADE ON DELETE CASCADE
     PRIMARY KEY (card_id)
 );
 
