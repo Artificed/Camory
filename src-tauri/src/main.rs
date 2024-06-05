@@ -570,6 +570,41 @@ fn fail_due_card(
     Ok(())
 }
 
+
+#[derive(Serialize, Deserialize, Clone)]
+struct GameCardChoice {
+    answer: String,
+    is_correct: bool,
+    clicked_times: i32,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+struct GameCard {
+    id: String,
+    game_id: String,
+    card: Card,
+    choices: Vec<GameCardChoice>,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+struct Game {
+    id: String,
+    name: String,
+    game_cards: Vec<GameCard>,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+struct GamePlayer {
+    game_id: String,
+    user_id: String,
+    score: i32,
+    correct_answers: i32,
+    incorrect_answers: i32,
+}
+
+
+
+
 fn main() {
     let mysql_config = MySQLConfig::new(
         "root".to_string(),
@@ -603,7 +638,7 @@ fn main() {
             pass_learning_card,
             pass_due_card,
             pass_relearning_card,
-            fail_due_card
+            fail_due_card,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
