@@ -8,6 +8,7 @@ import AddCardPage from './AddCardPage';
 import LearningPage from './LearningPage';
 import ProfilePage from './ProfilePage';
 import StatisticPage from './StatisticPage';
+import GameMenu from './GameMenu';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/learn/:deck_id" element={<LearningPage />}/>
         <Route path="/profile" element={<ProfilePage />}/>
         <Route path="/statistic" element={<StatisticPage />}/>
+        <Route path="/gamemenu" element={<GameMenu />}/>
       </Routes>
     </Router>
   );
