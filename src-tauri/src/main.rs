@@ -603,6 +603,7 @@ struct GamePlayer {
     incorrect_answers: i32,
 }
 
+#[tauri::command]
 fn get_cards_for_game(game_id: String, mysql_pool: State<Arc<Pool>>) -> Vec<GameCard> {
     let mut conn = mysql_pool.get_conn().expect("Failed to get connection");
 
@@ -693,7 +694,39 @@ fn get_games(mysql_pool: State<Arc<Pool>>) -> Vec<Game> {
     result
 }
 
+#[tauri::command]
+fn register_game_player (
+    game_id: String,
+    current_user: State<Arc<CurrentUser>>,
+    mysql_pool: State<Arc<Pool>>,
+) -> Result<(), String> {
+    let user = current_user.user.lock().unwrap();
+    if let Some(user) = &*user {
+        let user_id = user.id.clone();
+        let mut conn = mysql_pool.get_conn().map_err(|err| {
+            let error_message = format!("Failed to get connection: {}", err);
+            println!("{}", error_message);
+            error_message
+        })?;
 
+        conn.exec_drop(
+            "INSERT INTO game_players (game_id, user_id) 
+            VALUES (:game_id, :user_id)",
+            params! {
+                "game_id" => game_id,
+                "user_id" => user_id,
+            },
+        )
+        .map_err(|err| {
+            let error_message = format!("Failed to create game player: {}", err);
+            error_message
+        })?;
+
+        Ok(())
+    } else {
+        Err("No current user".into())
+    }
+}
 fn main() {
     let mysql_config = MySQLConfig::new(
         "root".to_string(),
@@ -728,7 +761,9 @@ fn main() {
             pass_due_card,
             pass_relearning_card,
             fail_due_card,
-            get_games
+            get_cards_for_game,
+            get_games,
+            register_game_player
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

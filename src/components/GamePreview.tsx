@@ -16,9 +16,10 @@ const GameCardPreview: React.FC<GameCardPreviewProps> = ({ game }) => {
 
   return (
     <div className="bg-white shadow-md rounded-lg p-4 flex flex-col items-center">
-      <img src={imageSrc} className="w-full h-48 object-cover rounded-md mb-4" />
-      <h2 className="text-lg font-semibold my-2">{game.name}</h2>
-      <Button text="Play Game" className="bg-blue-500 text-white text-sm h-10 w-28" onclick={handleGameClick}/>
+      <img src={imageSrc} className="w-full h-60 object-cover rounded-md mb-4" />
+      <h2 className="text-lg my-2">{game.name}</h2>
+      <h2 className="text-sm mb-4">{game.game_cards.length} Cards</h2>
+      <Button text="Play Game" className="theme-blue text-sm h-10 w-28" onclick={handleGameClick}/>
     </div>
   );
 }

@@ -28,7 +28,7 @@ function GameMenu() {
         {games.length === 0 ? (
           <p>Loading games...</p>
         ) : (
-          <div className="grid grid-cols-3 gap-8 p-4">
+          <div className="grid grid-cols-3 gap-10 mx-10 my-5 p-4">
             {games.map((game) => (
               <GameCardPreview key={game.id} game={game} />
             ))}
