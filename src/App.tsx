@@ -9,6 +9,7 @@ import LearningPage from './LearningPage';
 import ProfilePage from './ProfilePage';
 import StatisticPage from './StatisticPage';
 import GameMenu from './GameMenu';
+import GamePage from './GamePage';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/profile" element={<ProfilePage />}/>
         <Route path="/statistic" element={<StatisticPage />}/>
         <Route path="/gamemenu" element={<GameMenu />}/>
+        <Route path="/game/:game_id" element={<GamePage />}/>
       </Routes>
     </Router>
   );

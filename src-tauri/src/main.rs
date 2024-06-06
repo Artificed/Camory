@@ -590,6 +590,7 @@ struct GameCard {
 struct Game {
     id: String,
     name: String,
+    asset: String,
     game_cards: Vec<GameCard>,
 }
 
@@ -602,7 +603,95 @@ struct GamePlayer {
     incorrect_answers: i32,
 }
 
+fn get_cards_for_game(game_id: String, mysql_pool: State<Arc<Pool>>) -> Vec<GameCard> {
+    let mut conn = mysql_pool.get_conn().expect("Failed to get connection");
 
+    let game_cards: Vec<(String, String, String)> = conn
+        .exec(
+            "SELECT id, game_id, card_id 
+            FROM game_cards 
+            WHERE game_id = :game_id",
+            params! {
+                "game_id" => &game_id,
+            },
+        )
+        .expect("Failed to execute query");
+
+    let mut result: Vec<GameCard> = Vec::new();
+
+    for (id, game_id, card_id) in game_cards {
+        let card: Card = conn
+            .exec_first(
+                "SELECT id, vocabulary, clue, asset, definition, description 
+                FROM cards 
+                WHERE id = :card_id",
+                params! {
+                    "card_id" => &card_id,
+                },
+            )
+            .expect("Failed to fetch card")
+            .map(|(id, vocabulary, clue, asset, definition, description)| Card {
+                id,
+                vocabulary,
+                clue,
+                asset,
+                definition,
+                description,
+            })
+            .expect("Card not found");
+
+        let choices: Vec<GameCardChoice> = conn
+            .exec(
+                "SELECT answer, is_correct, clicked_times 
+                FROM game_card_choices 
+                WHERE game_card_id = :game_card_id",
+                params! {
+                    "game_card_id" => &id,
+                },
+            )
+            .expect("Failed to fetch choices")
+            .into_iter()
+            .map(|(answer, is_correct, clicked_times)| GameCardChoice {
+                answer,
+                is_correct,
+                clicked_times,
+            })
+            .collect();
+
+        result.push(GameCard {
+            id,
+            game_id,
+            card,
+            choices,
+        });
+    }
+
+    result
+}
+
+#[tauri::command]
+fn get_games(mysql_pool: State<Arc<Pool>>) -> Vec<Game> {
+    let mut conn = mysql_pool.get_conn().expect("Failed to get connection");
+
+    let games: Vec<(String, String, String)> = conn
+        .exec("SELECT id, name, asset
+        FROM games", ())
+        .expect("Failed to execute query");
+
+    let mut result: Vec<Game> = Vec::new();
+
+    for (id, name, asset) in games {
+        let game_cards = get_cards_for_game(id.clone(), mysql_pool.clone());
+        result.push(Game {
+            id,
+            name,
+            asset,
+            game_cards,
+        });
+    }
+
+    result
+}
 
 
 fn main() {
@@ -639,6 +728,7 @@ fn main() {
             pass_due_card,
             pass_relearning_card,
             fail_due_card,
+            get_games
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
