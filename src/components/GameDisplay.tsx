@@ -12,6 +12,7 @@ interface GameDisplayProps {
     nextQuestion: () => void;
     timeLeft: number;
     setTimeLeft: React.Dispatch<React.SetStateAction<number>>;
+    selectedAnswer?: GameCardChoice;
 }
 
 const GameDisplay: React.FC<GameDisplayProps> = ({ game_card, game_player, showQuestion, showAnswer, nextQuestion, timeLeft, setTimeLeft}) => {
@@ -27,9 +28,11 @@ const GameDisplay: React.FC<GameDisplayProps> = ({ game_card, game_player, showQ
                   setTimeLeft={setTimeLeft}
                 />
             ) : (
-                <AnswerDisplay
-                  
-                />
+              <AnswerDisplay
+              gameCard={game_card}
+              answer={game_card.choices.find(choice => choice.is_correct)?.answer || ''}
+              nextQuestion={nextQuestion}
+            />
             )}
           </div>
         </div>

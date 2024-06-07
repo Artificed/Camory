@@ -13,11 +13,11 @@ function GamePage() {
   const params = useParams();
   const gameId = params.game_id;
 
-  const [showQuestion, setShowQuestion] = useState<Boolean>(true);  // true: Ques, false: Ans
+  const [showQuestion, setShowQuestion] = useState<Boolean>(true);        // true: Ques, false: Ans
 
-  const [gameCards, setGameCards] = useState<GameCard[]>([]);       // Game's Cards
-  const [playerCardIds, setPlayerCardIds] = useState<string[]>([]); // Filter out new cards learned
-  const [gamePlayer, setGamePlayer] = useState<GamePlayer | null>(null);     // To register user as a player
+  const [gameCards, setGameCards] = useState<GameCard[]>([]);             // Game's Cards
+  const [playerCardIds, setPlayerCardIds] = useState<string[]>([]);       // Filter out new cards learned
+  const [gamePlayer, setGamePlayer] = useState<GamePlayer | null>(null);  // To register user as a player
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [timeLeft, setTimeLeft] = useState<number>(30);
  
@@ -41,8 +41,8 @@ function GamePage() {
   const nextQuestion = () => {
     setCurrentIndex(currentIndex + 1);
     fetchData();
+    setTimeLeft(30); // Reset the timer
     setShowQuestion(true);
-    setTimeLeft(30); // Reset the timer for the next question
   };
 
   const showAnswer = async (gameCardChoice: GameCardChoice, timeLeft: number) => {
@@ -57,7 +57,6 @@ function GamePage() {
       console.error("Error updating:", error);
     }
     setShowQuestion(false);
-    nextQuestion();
   }
 
   return (
