@@ -2,8 +2,8 @@
 
 function GameSummary() {
   return (
-    <div className="">
-      
+    <div className="mt-96">
+      summary
     </div>
   );
 }

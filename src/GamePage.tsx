@@ -3,9 +3,9 @@ import Navbar from './components/Navbar';
 import { invoke } from '@tauri-apps/api';
 import { useEffect, useState } from "react";
 import GamePlayer from "./models/GamePlayer";
-import Button from "./components/Button";
 import GameCard from "./models/GameCard";
 import GameDisplay from './components/GameDisplay';
+import GameSummary from "./components/GameSummary";
 
 function GamePage() {
 
@@ -38,9 +38,6 @@ function GamePage() {
   }, [params.game_id]); 
 
   const nextQuestion = () => {
-    if(currentIndex == gameCards.length) {
-      navigate(`game/${gameId}/summary/`)
-    }
     setCurrentIndex(currentIndex + 1);
     setShowQuestion(true);
   };
@@ -52,17 +49,17 @@ function GamePage() {
   return (
     <div>
       <Navbar />
-      <div className="flex flex-col items-center mt-32">
-        {gameCards.length > 0 ? (
+      <div className="flex flex-col items-center">
+        {currentIndex < gameCards.length ? (
           <GameDisplay
             game_card={gameCards[currentIndex]}
             game_player={gamePlayer}
             showQuestion={showQuestion}
-            onShowAnswer={showAnswer}
+            showAnswer={showAnswer}
             nextQuestion={nextQuestion}
           />
         ) : (
-          <p>Loading cards...</p>
+          <GameSummary />
         )}
       </div>
     </div>

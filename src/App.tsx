@@ -10,7 +10,6 @@ import ProfilePage from './ProfilePage';
 import StatisticPage from './StatisticPage';
 import GameMenu from './GameMenu';
 import GamePage from './GamePage';
-import GameSummary from './GameSummary';
 
 function App() {
   return (
@@ -27,7 +26,6 @@ function App() {
         <Route path="/statistic" element={<StatisticPage />}/>
         <Route path="/gamemenu" element={<GameMenu />}/>
         <Route path="/game/:game_id" element={<GamePage />}/>
-        <Route path="/game/:game_id/summary" element={<GameSummary />}/>
       </Routes>
     </Router>
   );

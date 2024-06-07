@@ -7,24 +7,29 @@ interface GameDisplayProps {
     game_card: GameCard;
     game_player: GamePlayer | null;
     showQuestion: Boolean;
-    onShowAnswer: () => void;
+    showAnswer: () => void;
     nextQuestion: () => void;
 }
 
-const CardDisplay: React.FC<GameDisplayProps> = ({ game_card, game_player, showQuestion, onShowAnswer, nextQuestion}) => {
+const GameDisplay: React.FC<GameDisplayProps> = ({ game_card, game_player, showQuestion, showAnswer, nextQuestion}) => {
     return (
-        <div>
+        <div className="w-screen h-screen">
+          <div className="mt-16">
             {showQuestion ? (
                 <QuestionDisplay
-
+                  gameCard={game_card}
+                  game_player={game_player}
+                  nextQuestion={nextQuestion}
+                  showAnswer={showAnswer}
                 />
             ) : (
                 <AnswerDisplay
 
                 />
             )}
+          </div>
         </div>
     );
 };
 
-export default CardDisplay;
+export default GameDisplay;
