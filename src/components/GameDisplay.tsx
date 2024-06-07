@@ -10,9 +10,11 @@ interface GameDisplayProps {
     showQuestion: Boolean;
     showAnswer: (selectedAnswer: GameCardChoice, timeLeft: number) => void;  // Update type
     nextQuestion: () => void;
+    timeLeft: number;
+    setTimeLeft: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const GameDisplay: React.FC<GameDisplayProps> = ({ game_card, game_player, showQuestion, showAnswer, nextQuestion}) => {
+const GameDisplay: React.FC<GameDisplayProps> = ({ game_card, game_player, showQuestion, showAnswer, nextQuestion, timeLeft, setTimeLeft}) => {
     return (
         <div className="w-screen h-screen">
           <div className="mt-16">
@@ -20,8 +22,9 @@ const GameDisplay: React.FC<GameDisplayProps> = ({ game_card, game_player, showQ
                 <QuestionDisplay
                   gameCard={game_card}
                   game_player={game_player}
-                  nextQuestion={nextQuestion}
                   showAnswer={showAnswer}
+                  timeLeft={timeLeft}
+                  setTimeLeft={setTimeLeft}
                 />
             ) : (
                 <AnswerDisplay

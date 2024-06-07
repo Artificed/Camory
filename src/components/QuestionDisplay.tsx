@@ -7,13 +7,13 @@ import GameCardChoice from "../models/GameCardChoice";
 interface QuestionDisplayProps {
   gameCard: GameCard;
   game_player: GamePlayer | null;
-  nextQuestion: () => void;
-  showAnswer: (selectedAnswer: GameCardChoice, timeLeft: number) => void;  // Update type
+  showAnswer: (selectedAnswer: GameCardChoice, timeLeft: number) => void;
+  timeLeft: number;
+  setTimeLeft: React.Dispatch<React.SetStateAction<number>>;
 }
 
-function QuestionDisplay({ gameCard, game_player, nextQuestion, showAnswer }: QuestionDisplayProps) {
+function QuestionDisplay({ gameCard, game_player, showAnswer, timeLeft, setTimeLeft }: QuestionDisplayProps) {
 
-  const [timeLeft, setTimeLeft] = useState<number>(30);
   const imageSrc = gameCard.card.asset ? `data:image/jpeg;base64,${gameCard.card.asset}` : ''
 
   useEffect(() => {
@@ -26,7 +26,7 @@ function QuestionDisplay({ gameCard, game_player, nextQuestion, showAnswer }: Qu
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeLeft, showAnswer]);
+  }, [timeLeft, showAnswer, setTimeLeft, gameCard.choices]);
   
   const formattedTime = String(timeLeft).padStart(2, '0');
 

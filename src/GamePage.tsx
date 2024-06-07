@@ -9,7 +9,6 @@ import GameSummary from "./components/GameSummary";
 import GameCardChoice from "./models/GameCardChoice";
 
 function GamePage() {
-
   const navigate = useNavigate();
   const params = useParams();
   const gameId = params.game_id;
@@ -20,27 +19,30 @@ function GamePage() {
   const [playerCardIds, setPlayerCardIds] = useState<string[]>([]); // Filter out new cards learned
   const [gamePlayer, setGamePlayer] = useState<GamePlayer | null>(null);     // To register user as a player
   const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [timeLeft, setTimeLeft] = useState<number>(30);
  
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const cardsResult = await invoke<GameCard[]>("get_cards_for_game", { gameId });
-        const playerResult = await invoke<GamePlayer>("register_game_player", { gameId });
-        const playerCardIdsResult = await invoke<string[]>("get_user_card_ids");
-        setGameCards(cardsResult);
-        setGamePlayer(playerResult);
-        setPlayerCardIds(playerCardIdsResult);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+  const fetchData = async () => {
+    try {
+      const cardsResult = await invoke<GameCard[]>("get_cards_for_game", { gameId });
+      const playerResult = await invoke<GamePlayer>("register_game_player", { gameId });
+      const playerCardIdsResult = await invoke<string[]>("get_user_card_ids");
+      setGameCards(cardsResult);
+      setGamePlayer(playerResult);
+      setPlayerCardIds(playerCardIdsResult);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
   }, [params.game_id]); 
 
   const nextQuestion = () => {
     setCurrentIndex(currentIndex + 1);
+    fetchData();
     setShowQuestion(true);
+    setTimeLeft(30); // Reset the timer for the next question
   };
 
   const showAnswer = async (gameCardChoice: GameCardChoice, timeLeft: number) => {
@@ -54,7 +56,8 @@ function GamePage() {
     } catch (error) {
       console.error("Error updating:", error);
     }
-    // setShowQuestion(false);
+    setShowQuestion(false);
+    nextQuestion();
   }
 
   return (
@@ -68,6 +71,8 @@ function GamePage() {
             showQuestion={showQuestion}
             showAnswer={showAnswer}
             nextQuestion={nextQuestion}
+            timeLeft={timeLeft}
+            setTimeLeft={setTimeLeft}
           />
         ) : (
           <GameSummary />
