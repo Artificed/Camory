@@ -695,11 +695,11 @@ fn get_games(mysql_pool: State<Arc<Pool>>) -> Vec<Game> {
 }
 
 #[tauri::command]
-fn register_game_player (
+fn register_game_player(
     game_id: String,
     current_user: State<Arc<CurrentUser>>,
     mysql_pool: State<Arc<Pool>>,
-) -> Result<(), String> {
+) -> Result<GamePlayer, String> {
     let user = current_user.user.lock().unwrap();
     if let Some(user) = &*user {
         let user_id = user.id.clone();
@@ -709,20 +709,91 @@ fn register_game_player (
             error_message
         })?;
 
-        conn.exec_drop(
-            "INSERT INTO game_players (game_id, user_id) 
-            VALUES (:game_id, :user_id)",
+        let existing_player: Option<(String, String, i32, i32, i32)> = conn.exec_first(
+            "SELECT game_id, user_id, score, correct_answers, incorrect_answers 
+             FROM game_players 
+             WHERE game_id = :game_id AND user_id = :user_id",
             params! {
-                "game_id" => game_id,
-                "user_id" => user_id,
+                "game_id" => &game_id,
+                "user_id" => &user_id,
             },
-        )
-        .map_err(|err| {
-            let error_message = format!("Failed to create game player: {}", err);
+        ).map_err(|err| {
+            let error_message = format!("Failed to check existing game player: {}", err);
+            println!("{}", error_message);
             error_message
         })?;
 
-        Ok(())
+        if let Some((game_id, user_id, score, correct_answers, incorrect_answers)) = existing_player {
+            Ok(GamePlayer {
+                game_id,
+                user_id,
+                score,
+                correct_answers,
+                incorrect_answers,
+            })
+        } else {
+            let score = 0;
+            let correct_answers = 0;
+            let incorrect_answers = 0;
+            conn.exec_drop(
+                "INSERT INTO game_players (game_id, user_id, score, correct_answers, incorrect_answers) 
+                 VALUES (:game_id, :user_id, :score, :correct_answers, :incorrect_answers)",
+                params! {
+                    "game_id" => &game_id,
+                    "user_id" => &user_id,
+                    "score" => score,
+                    "correct_answers" => correct_answers,
+                    "incorrect_answers" => incorrect_answers,
+                },
+            ).map_err(|err| {
+                let error_message = format!("Failed to create game player: {}", err);
+                println!("{}", error_message);
+                error_message
+            })?;
+
+            let game_player = GamePlayer {
+                game_id,
+                user_id,
+                score,
+                correct_answers,
+                incorrect_answers,
+            };
+
+            Ok(game_player)
+        }
+    } else {
+        Err("No current user".into())
+    }
+}
+
+#[tauri::command]
+fn get_user_card_ids(current_user: State<Arc<CurrentUser>>, mysql_pool: State<Arc<Pool>>) -> Result<Vec<String>, String> {
+    let user = current_user.user.lock().unwrap();
+
+    if let Some(user) = &*user {
+        let user_id = user.id.clone();
+        let mut conn = mysql_pool.get_conn().map_err(|err| {
+            let error_message = format!("Failed to get connection: {}", err);
+            println!("{}", error_message);
+            error_message
+        })?;
+
+        let user_cards: Vec<String> = conn
+            .exec(
+                "SELECT uc.card_id FROM user_cards uc
+                JOIN decks d ON uc.deck_id = d.id
+                WHERE d.user_id = :user_id",
+                params! {
+                    "user_id" => &user_id,
+                },
+            )
+            .map_err(|err| {
+                let error_message = format!("Failed to execute query: {}", err);
+                println!("{}", error_message);
+                error_message
+            })?;
+
+        Ok(user_cards)
     } else {
         Err("No current user".into())
     }
@@ -763,7 +834,8 @@ fn main() {
             fail_due_card,
             get_cards_for_game,
             get_games,
-            register_game_player
+            register_game_player,
+            get_user_card_ids
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
