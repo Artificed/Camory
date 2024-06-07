@@ -383,6 +383,36 @@ fn insert_user_card(
 }
 
 #[tauri::command]
+fn insert_user_card_from_game(
+    deck_id: String,
+    card_id: String,
+    mysql_pool: State<Arc<Pool>>,
+) -> Result<(), String> {
+    let mut conn = mysql_pool
+        .get_conn()
+        .map_err(|e| format!("Failed to get connection: {:?}", e))?;
+
+    let id = Uuid::new_v4().to_string();
+
+    let result_card = conn.exec_drop(
+        "INSERT INTO user_cards (id, deck_id, card_id, status)
+        VALUES (:id, :deck_id, :card_id, :status)",
+        params! {
+            "id" => &id,
+            "deck_id" => &deck_id,
+            "card_id" => &card_id,
+            "status" => "new",
+        },
+    );
+
+    if let Err(e) = result_card {
+        return Err(format!("Failed to insert into cards: {:?}", e));
+    }
+
+    Ok(())
+}
+
+#[tauri::command]
 fn fail_learning_card(
     card_id: String,
     mysql_pool: State<Arc<Pool>>,
@@ -918,7 +948,8 @@ fn main() {
             register_game_player,
             get_user_card_ids,
             increment_clicked_times,
-            update_player_stats
+            update_player_stats,
+            insert_user_card_from_game
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

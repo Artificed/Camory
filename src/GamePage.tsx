@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Navbar from './components/Navbar';
 import { invoke } from '@tauri-apps/api';
 import { useEffect, useState } from "react";
@@ -9,7 +9,6 @@ import GameSummary from "./components/GameSummary";
 import GameCardChoice from "./models/GameCardChoice";
 
 function GamePage() {
-  const navigate = useNavigate();
   const params = useParams();
   const gameId = params.game_id;
 
@@ -27,8 +26,8 @@ function GamePage() {
       const playerResult = await invoke<GamePlayer>("register_game_player", { gameId });
       const playerCardIdsResult = await invoke<string[]>("get_user_card_ids");
       setGameCards(cardsResult);
-      setGamePlayer(playerResult);
       setPlayerCardIds(playerCardIdsResult);
+      setGamePlayer(playerResult);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -74,7 +73,7 @@ function GamePage() {
             setTimeLeft={setTimeLeft}
           />
         ) : (
-          <GameSummary />
+          <GameSummary playerCardIds={playerCardIds} gameCards={gameCards} gamePlayer={gamePlayer}/>
         )}
       </div>
     </div>
