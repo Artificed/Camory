@@ -798,6 +798,87 @@ fn get_user_card_ids(current_user: State<Arc<CurrentUser>>, mysql_pool: State<Ar
         Err("No current user".into())
     }
 }
+
+#[tauri::command]
+fn increment_clicked_times(
+    game_card_id: String,
+    answer: String,
+    mysql_pool: State<Arc<Pool>>,
+) -> Result<(), String> {
+    let mut conn = mysql_pool
+        .get_conn()
+        .map_err(|e| format!("Failed to get connection: {:?}", e))?;
+
+    let result_card = conn.exec_drop(
+        "UPDATE game_card_choices
+        SET clicked_times = clicked_times + 1
+        WHERE game_card_id = :game_card_id AND answer = :answer",
+        params! {
+            "game_card_id" => game_card_id,
+            "answer" => answer,
+        },
+    );
+
+    match result_card {
+        Ok(_) => Ok(()),
+        Err(e) => Err(format!("Failed to update: {:?}", e)),
+    }
+}
+
+#[tauri::command]
+fn update_player_stats(
+    game_id: String,
+    is_correct: bool,
+    time_left: i16,
+    current_user: State<Arc<CurrentUser>>,
+    mysql_pool: State<Arc<Pool>>,
+) -> Result<(), String> {
+    let user = current_user.user.lock().unwrap();
+
+    if let Some(user) = &*user {
+        let user_id = user.id.clone();
+        let score_gain = time_left * 100;
+
+        let mut conn = mysql_pool.get_conn().map_err(|err| {
+            let error_message = format!("Failed to get connection: {}", err);
+            println!("{}", error_message);
+            error_message
+        })?;
+
+        if is_correct {
+            let result = conn.exec_drop(
+                "UPDATE game_players
+                SET correct_answers = correct_answers + 1, score = score + :score_gain
+                WHERE game_id = :game_id AND user_id = :user_id",
+                params! {
+                    "score_gain" => score_gain,
+                    "game_id" => game_id,
+                    "user_id" => user_id,
+                },
+            );
+            if result.is_err() {
+                return Err(format!("Failed to update: {:?}", result.err()));
+            }
+        } else {
+            let result = conn.exec_drop(
+                "UPDATE game_players
+                SET incorrect_answers = incorrect_answers + 1 
+                WHERE game_id = :game_id AND user_id = :user_id",
+                params! {
+                    "game_id" => game_id,
+                    "user_id" => user_id,
+                },
+            );
+            if result.is_err() {
+                return Err(format!("Failed to update: {:?}", result.err()));
+            }
+        }
+
+        Ok(())
+    } else {
+        Err("No current user".into())
+    }
+}
 fn main() {
     let mysql_config = MySQLConfig::new(
         "root".to_string(),
@@ -835,7 +916,9 @@ fn main() {
             get_cards_for_game,
             get_games,
             register_game_player,
-            get_user_card_ids
+            get_user_card_ids,
+            increment_clicked_times,
+            update_player_stats
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

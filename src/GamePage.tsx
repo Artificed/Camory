@@ -6,6 +6,7 @@ import GamePlayer from "./models/GamePlayer";
 import GameCard from "./models/GameCard";
 import GameDisplay from './components/GameDisplay';
 import GameSummary from "./components/GameSummary";
+import GameCardChoice from "./models/GameCardChoice";
 
 function GamePage() {
 
@@ -42,8 +43,18 @@ function GamePage() {
     setShowQuestion(true);
   };
 
-  const showAnswer = () => {
-    setShowQuestion(false);
+  const showAnswer = async (gameCardChoice: GameCardChoice, timeLeft: number) => {
+    try {
+      if(timeLeft != 0) {
+        await invoke("increment_clicked_times", { gameCardId: gameCards[currentIndex].id, answer: gameCardChoice.answer });
+        await invoke("update_player_stats", { gameId: gameId, isCorrect: gameCardChoice.is_correct, timeLeft: timeLeft });
+      } else {
+         await invoke("update_player_stats", { gameId: gameId, isCorrect: false, timeLeft: 0 });
+      }
+    } catch (error) {
+      console.error("Error updating:", error);
+    }
+    // setShowQuestion(false);
   }
 
   return (

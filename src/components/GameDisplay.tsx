@@ -2,12 +2,13 @@ import QuestionDisplay from "./QuestionDisplay";
 import AnswerDisplay from "./AnswerDisplay";
 import GameCard from "../models/GameCard";
 import GamePlayer from "../models/GamePlayer";
+import GameCardChoice from "../models/GameCardChoice";
 
 interface GameDisplayProps {
     game_card: GameCard;
     game_player: GamePlayer | null;
     showQuestion: Boolean;
-    showAnswer: () => void;
+    showAnswer: (selectedAnswer: GameCardChoice, timeLeft: number) => void;  // Update type
     nextQuestion: () => void;
 }
 
@@ -24,7 +25,7 @@ const GameDisplay: React.FC<GameDisplayProps> = ({ game_card, game_player, showQ
                 />
             ) : (
                 <AnswerDisplay
-
+                  
                 />
             )}
           </div>
