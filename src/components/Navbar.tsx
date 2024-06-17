@@ -19,7 +19,7 @@ function Navbar() {
         if (!isMenuClicked) {
             setBurgerClass("clicked");
             setMenuClass("left-0");
-            setWrapperClass("block bg-black bg-opacity-50");
+            setWrapperClass("block bg-black bg-opacity-50 z-30");
         } else {
             setBurgerClass("unclicked");
             setMenuClass("-left-[22vw]");
@@ -45,7 +45,7 @@ function Navbar() {
     }
 
     return (
-        <div className="h-16 top-0 p-3 w-screen bg-[#FAF6EE] flex items-center fixed">
+        <div className="h-16 top-0 p-3 w-screen bg-[#FAF6EE] flex items-center fixed z-10">
             <div className="burgerMenu flex flex-col items-center justify-evenly h-9 w-9 m-1.5 cursor-pointer z-50" onClick={updateMenu}>
                 <div className={`burgerBar w-6 h-0.5 bg-black rounded transition-transform duration-500 ease-out ${burger_class === 'clicked' ? 'translate-y-2.5' : ''}`}></div>
                 <div className="burgerBar w-6 h-0.5 bg-black rounded transition-transform duration-500 ease-out"></div>

@@ -6,6 +6,7 @@ import Button from "./components/Button";
 import DeckDisplay from "./components/DeckDisplay";
 import User from "./models/User";
 import Deck from "./models/Deck";
+import background_home from './assets/background_home.png';
 
 function HomePage() {
   const navigate = useNavigate();
@@ -79,6 +80,9 @@ function HomePage() {
         ) : (
           <div>Error</div>
         )}
+        <div className="fixed bottom-0 right-0 opacity-50 -z-50 w-8/12 bg-blue-100">
+          <img src={background_home} alt="background logo" className="object-cover"/>
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "./components/Button";
+import Loading from "./components/Loading"
+import WarningMessage from "./components/WarningMessage";
 import logo from './assets/logo.png';
 import { invoke } from '@tauri-apps/api';
 import flag_idn from './assets/icon_Indonesia.png'
@@ -17,6 +19,7 @@ function RegisterPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [isLoading, setIsLoading] = useState(false); 
 
     const [errorMessage, setErrorMessage] = useState("");
     const navigate = useNavigate();
@@ -27,23 +30,29 @@ function RegisterPage() {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setIsLoading(true);
 
         if (!email || !username || !password || !confirmPassword) {
             setErrorMessage("Please fill all the fields!");
+            setIsLoading(false);
             return;
         }
 
         if (password !== confirmPassword) {
             setErrorMessage("Passwords do not match!");
+            setIsLoading(false);
             return;
         }
 
         try {
             await invoke('register', { email, password, username });
+            setIsLoading(false);
             navigate("/");
         } catch (error) {
             setErrorMessage("Registration Failed!");
         }
+
+        setIsLoading(false);
     };
 
     return (
@@ -105,9 +114,12 @@ function RegisterPage() {
                     placeholder="Confirm your password"
                 />
 
-                {errorMessage && <p className="text-red-500 absolute bottom-24">{errorMessage}</p>}
-                
-                <Button text="Register" className="bright-red mt-12 mb-14 hover:bg-[#edaa92]" />
+                {errorMessage && <WarningMessage className="mt-4" errorMessage={errorMessage}></WarningMessage>}
+
+                {!isLoading && <Button text="Register" className="bright-red mt-12 mb-14 text-red-800 hover:bg-[#edaa92]"/>}
+
+                {isLoading && 
+                <Loading className="mt-12 mb-14 text-red-800"></Loading>}
             </form>
         </div>
     );

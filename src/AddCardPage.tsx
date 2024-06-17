@@ -4,6 +4,8 @@ import Navbar from './components/Navbar';
 import AddCardFront from './components/AddCardFront';
 import AddCardBack from './components/AddCardBack';
 import Button from './components/Button';
+import Loading from './components/Loading'
+import WarningMessage from './components/WarningMessage';
 import { invoke } from '@tauri-apps/api';
 
 function AddCardPage() {
@@ -26,6 +28,8 @@ function AddCardPage() {
 
     const [errorMessage, setErrorMessage] = useState<string>("");
 
+    const [isLoading, setIsLoading] = useState(false); 
+
     const handleArrowBack = () => {
         setPageNumber(1);
         setPageInfo("Front card");
@@ -37,20 +41,26 @@ function AddCardPage() {
     }
 
     const handleSubmit = async () => {
+        setIsLoading(true);
         if (!vocabulary) {
             setErrorMessage("Vocabulary cannot be empty!");
+            setIsLoading(false);
             return;
         } else if (!clue) {
             setErrorMessage("Clue cannot be empty!");
+            setIsLoading(false);
             return;
         } else if (!asset) {
             setErrorMessage("Asset cannot be empty!");
+            setIsLoading(false);
             return;
         } else if (!definition) {
             setErrorMessage("Definition cannot be empty!");
+            setIsLoading(false);
             return;
         } else if (!description) {
             setErrorMessage("Description cannot be empty!");
+            setIsLoading(false);
             return;
         } 
 
@@ -69,13 +79,16 @@ function AddCardPage() {
                     definition, 
                     description 
                 });
+                setIsLoading(false);
                 navigate('/home');
             } catch (error) {
                 setErrorMessage("Create Card Failed!");
                 console.error("Create Card Error:", error);
+                setIsLoading(false);
             }
         };
         reader.readAsArrayBuffer(asset);
+        setIsLoading(false);
     };
 
     return (
@@ -104,10 +117,19 @@ function AddCardPage() {
                             <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                         </svg>
                     </div>
-                    {pageNumber === 2 && (
-                        <Button text='Submit' className='bright-red absolute translate-y-20 hover:bg-[#edaa92]' onclick={handleSubmit}/>
+
+                    {errorMessage && 
+                    <WarningMessage className="absolute translate-y-14"
+                        errorMessage={errorMessage}
+                    />
+                    }
+
+                    {pageNumber === 2 && !isLoading && (
+                        <Button text='Submit' className='bright-red absolute translate-y-24 hover:bg-[#edaa92]' onclick={handleSubmit}/>
                     )}
-                    {errorMessage && <p className="text-red-500 translate-y-4 text-sm">{errorMessage}</p>}
+
+                    {pageNumber == 2 && isLoading && 
+                    (<Loading className="absolute translate-y-24 text-red-800"></Loading>)}
                 </div>
             </div>
         </div>
