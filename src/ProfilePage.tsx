@@ -41,9 +41,9 @@ function ProfilePage() {
 
                 <div className="flex flex-col justify-center items-center">
                     <div>
-                        <img src="./src/assets/profile_picture.jpg" alt="" className='w-60 relative z-10 rounded-full object-cover'/>
+                        <img src="./src/assets/profile_picture.jpg" alt="" className='w-60 relative rounded-full object-cover -z-20'/>
                     </div>
-                    <div className='rounded-xl border-2 border-gray-500 text-base p-8 pt-24 absolute top-[21rem] w-[21rem] z-0'>
+                    <div className='rounded-xl border-2 border-gray-500 text-base p-8 pt-24 absolute top-[21rem] w-[21rem] -z-50'>
                         <ul className="mb-8">
                             <li className="font-bold">Username</li>
                             {user && <li className="mb-4">{user.username}</li>}

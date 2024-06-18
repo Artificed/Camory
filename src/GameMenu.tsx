@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api";
 import Game from "./models/Game";
 import GameCardPreview from "./components/GamePreview";
+import logo_load from "./assets/logo_load.png"
 
 function GameMenu() {
   const navigate = useNavigate();
@@ -21,17 +22,24 @@ function GameMenu() {
     fetchGames();
   }, [navigate]);
 
+
   return (
     <div>
       <Navbar />
       <div className="mt-16 flex flex-col items-center hide-scrollbar">
         {games.length === 0 ? (
-          <p>Loading games...</p>
+          <div className="flex flex-col justify-center items-center w-1/5 absolute top-1/3">
+            <img src={logo_load} alt="Centered Image" className="animate-pulse"></img>
+            <div className="text-2xl font-medium opacity-65">Loading...</div>
+          </div>
         ) : (
-          <div className="grid grid-cols-3 gap-10 mx-10 my-5 p-4">
-            {games.map((game) => (
-              <GameCardPreview key={game.id} game={game} />
-            ))}
+          <div>
+            <h1 className="ml-10 px-4 mt-7 title">Games</h1>
+            <div className="grid grid-cols-3 gap-10 mx-10 mb-2 p-4">
+              {games.map((game) => (
+                <GameCardPreview key={game.id} game={game} />
+              ))}
+            </div>
           </div>
         )}
       </div>

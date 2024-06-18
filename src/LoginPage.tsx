@@ -1,7 +1,9 @@
-import { useState } from 'react'; // Import useState hook
+import { useEffect, useState } from 'react'; // Import useState hook
 import { invoke } from "@tauri-apps/api";
 import { useNavigate } from "react-router-dom";
 import Button from './components/Button';
+import Loading from './components/Loading';
+import WarningMessage from './components/WarningMessage';
 import logo from './assets/logo.png';
 import flag_idn from './assets/icon_Indonesia.png'
 import flag_chn from './assets/icon_China.png'
@@ -16,6 +18,7 @@ function LoginPage() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState(""); 
+    const [isLoading, setIsLoading] = useState(false); 
     const navigate = useNavigate();
 
     const handleLogoClick = () => {
@@ -24,9 +27,10 @@ function LoginPage() {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
+        setIsLoading(true);
         if (!username || !password) {
             setErrorMessage("Please fill all the fields!");
+            setIsLoading(false);
             return;
         }
 
@@ -39,6 +43,8 @@ function LoginPage() {
         } else {
             setErrorMessage("Invalid username or password.");
         }
+
+        setIsLoading(false);
     };
 
     return (
@@ -70,9 +76,13 @@ function LoginPage() {
                 <input type="password" name="password" value={password} className="mt-8 w-5/6 px-4 py-2 rounded-lg border-b-2 transition ease-linear duration-300 hover:bg-[#faf5ea] active:bg-[#faf5ea]" 
                 onChange={(e) => setPassword(e.target.value)} placeholder="Password"/>
 
-                {errorMessage && <p className="text-red-500 absolute mt-56">{errorMessage}</p>}
+                {errorMessage && <WarningMessage className="mt-4" errorMessage={errorMessage}></WarningMessage>}
 
-                <Button text="Login" className="bright-red mt-12 mb-12 hover:bg-[#edaa92]" />
+                {!isLoading && <Button text="Register" className="bright-red mt-12 mb-12 text-red-800 hover:bg-[#edaa92]"/>}
+
+                {isLoading && 
+                <Loading className="mt-12 mb-12 text-red-800"></Loading>}
+
             </form>
         </div>
     );
