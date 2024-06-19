@@ -5,14 +5,7 @@ import Button from './components/Button';
 import Loading from './components/Loading';
 import WarningMessage from './components/WarningMessage';
 import logo from './assets/logo.png';
-import flag_idn from './assets/icon_Indonesia.png'
-import flag_chn from './assets/icon_China.png'
-import flag_gmn from './assets/icon_Germany.png'
-import flag_kor from './assets/icon_Korea.png'
-import flag_fra from './assets/icon_France.png'
-import flag_usa from './assets/icon_UnitedStates.png'
-import flag_uk from './assets/icon_UnitedKingdom.png'
-import flag_jp from './assets/icon_Japan.png'
+import BackgroundFlag from './components/BackgroundFlag';
 
 function LoginPage() {
     const [username, setUsername] = useState("");
@@ -49,18 +42,7 @@ function LoginPage() {
 
     return (
         <div className="h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#faf6ee] to-[#ffeabf]">
-            <ul className="indonesia">
-                <img src={flag_idn} alt=""/>
-                <img src={flag_chn} alt=""/>
-                <img src={flag_gmn} alt=""/>
-                <img src={flag_kor} alt=""/>
-                <img src={flag_jp} alt=""/>
-                <img src={flag_fra} alt=""/>
-                <img src={flag_usa} alt=""/>
-                <img src={flag_uk} alt=""/>
-                <img src={flag_idn} alt=""/>
-                <img src={flag_uk} alt=""/>
-            </ul>
+            <BackgroundFlag />
 
             <img src={logo} className='mb-4 hover:cursor-pointer z-10' onClick={handleLogoClick}/>
 
@@ -78,7 +60,7 @@ function LoginPage() {
 
                 {errorMessage && <WarningMessage className="mt-4" errorMessage={errorMessage}></WarningMessage>}
 
-                {!isLoading && <Button text="Register" className="bright-red mt-12 mb-12 text-red-800 hover:bg-[#edaa92]"/>}
+                {!isLoading && <Button text="Login" className="bright-red mt-12 mb-12 text-red-800 hover:bg-[#edaa92]"/>}
 
                 {isLoading && 
                 <Loading className="mt-12 mb-12 text-red-800"></Loading>}
