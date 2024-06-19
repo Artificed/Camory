@@ -10,17 +10,17 @@ import flag_jp from '../assets/icon_Japan.png'
 function BackgroundFlag() {
     return (
         <ul className="indonesia">
-                <img src={flag_idn} alt=""/>
-                <img src={flag_chn} alt=""/>
-                <img src={flag_gmn} alt=""/>
-                <img src={flag_kor} alt=""/>
-                <img src={flag_jp} alt=""/>
-                <img src={flag_fra} alt=""/>
-                <img src={flag_usa} alt=""/>
-                <img src={flag_uk} alt=""/>
-                <img src={flag_idn} alt=""/>
-                <img src={flag_uk} alt=""/>
-            </ul>
+            <img src={flag_idn} alt=""/>
+            <img src={flag_chn} alt=""/>
+            <img src={flag_gmn} alt=""/>
+            <img src={flag_kor} alt=""/>
+            <img src={flag_jp} alt=""/>
+            <img src={flag_fra} alt=""/>
+            <img src={flag_usa} alt=""/>
+            <img src={flag_uk} alt=""/>
+            <img src={flag_idn} alt=""/>
+            <img src={flag_uk} alt=""/>
+        </ul>
     );
 }
 

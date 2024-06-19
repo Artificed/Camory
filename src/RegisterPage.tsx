@@ -6,6 +6,7 @@ import WarningMessage from "./components/WarningMessage";
 import logo from './assets/logo.png';
 import { invoke } from '@tauri-apps/api';
 import BackgroundFlag from './components/BackgroundFlag';
+import BackButton from "./components/BackButton";
 
 function RegisterPage() {
     const [username, setUsername] = useState("");
@@ -17,8 +18,12 @@ function RegisterPage() {
     const [errorMessage, setErrorMessage] = useState("");
     const navigate = useNavigate();
 
-    const handleLogoClick = () => {
+    const navigateToLanding = () => {
         navigate('/');
+    }
+
+    const navigateToLogin = () => {
+        navigate('/login')
     }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -52,10 +57,10 @@ function RegisterPage() {
         <div className="h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#faf6ee] to-[#ffeabf]">
             <BackgroundFlag />
             
-            <img src={logo} onClick={handleLogoClick} className="hover:cursor-pointer z-10" />
+            <img src={logo} onClick={navigateToLanding} className="hover:cursor-pointer z-10" />
 
             <form onSubmit={handleSubmit} 
-                className='bg-white w-2/5
+                className='bg-white w-2/5 mb-4
                     flex flex-col items-center rounded-2xl translate-y-5 h-fit'>
 
                 <p className="text-3xl mt-10">Sign Up</p>
@@ -96,13 +101,28 @@ function RegisterPage() {
                     placeholder="Confirm your password"
                 />
 
+
                 {errorMessage && <WarningMessage className="mt-4" errorMessage={errorMessage}></WarningMessage>}
 
-                {!isLoading && <Button text="Register" className="bright-red mt-12 mb-14 text-red-800 hover:bg-[#edaa92]"/>}
+                {!isLoading && <Button text="Register" className="bright-red mt-8 mb-4 text-red-800 hover:bg-[#edaa92]"/>}
 
                 {isLoading && 
-                <Loading className="mt-12 mb-14 text-red-800"></Loading>}
+                <Loading className="mt-12 mb-4 text-red-800"></Loading>}
+                
+                <div className="flex flex-row gap-x-1 mb-8 text-sm">
+                    Already have an account? 
+                    <a 
+                    className="text-blue-500 hover:text-blue-700 underline hover:no-underline font-medium cursor-pointer" 
+                    onClick={navigateToLogin}>
+                        Login here
+                    </a>
+                </div>
+
             </form>
+
+            <BackButton 
+            className="z-50 flex mt-4 items-start justify-left w-1/2 px-5 py-2 text-sm text-gray-700 transition-colors duration-200 bg-white border rounded-lg gap-x-2 sm:w-auto dark:hover:bg-gray-800 dark:bg-gray-900 hover:bg-gray-100 dark:text-gray-200 dark:border-gray-700" 
+            onclick={navigateToLanding} />
         </div>
     );
 }
