@@ -24,10 +24,10 @@ const AnswerDisplay: React.FC<AnswerDisplayProps> = ({ gameCard, answer, nextQue
         <div>{gameCard.choices[2].answer}</div>
         <div>{gameCard.choices[3].answer}</div>
       </div>
-      <div className="mt-14 text-center text-2xl text-blue-950">Correct Answer is...</div>
-      <div className="mt-6 px-8 py-3 text-xl theme-green text-green-900 rounded-lg">{answer}</div>
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" 
-        className="size-24 absolute right-10 top-1/2 transform -translate-y-1/2 cursor-pointer" onClick={nextQuestion}>
+      <div className="mt-14 text-center text-2xl text-blue-950">Correct answer is...</div>
+      <div className="mt-4 px-8 py-3 text-xl theme-green text-green-900 rounded-lg">{answer}</div>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={0.5} stroke="currentColor" 
+        className="size-24 absolute right-10 top-1/2 transform -translate-y-1/2 cursor-pointer transition-colors rounded-xl hover:bg-slate-200" onClick={nextQuestion}>
         <path strokeLinecap="round" strokeLinejoin="round" d="m5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5" />
       </svg>
     </div>

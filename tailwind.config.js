@@ -83,7 +83,7 @@ module.exports = {
             transform: 'translateY(0) translateX(0)',
             transitionTimingFunction: 'up'
           }
-        },
+        }
       },
       animation: {
         small_bounce: 'small_bounce 1s infinite',

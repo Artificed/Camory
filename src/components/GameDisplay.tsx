@@ -3,6 +3,7 @@ import AnswerDisplay from "./AnswerDisplay";
 import GameCard from "../models/GameCard";
 import GamePlayer from "../models/GamePlayer";
 import GameCardChoice from "../models/GameCardChoice";
+import game from "../models/Game"
 
 interface GameDisplayProps {
     game_card: GameCard;

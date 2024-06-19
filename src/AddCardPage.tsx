@@ -94,7 +94,7 @@ function AddCardPage() {
     return (
         <div className="theme-brown-light h-screen flex justify-center">
             <Navbar />
-            <div className="grid grid-cols-2 justify-center items-center translate-x-20">
+            <div className="grid grid-cols-2 justify-center items-center ml-[80px]">
                 <form className="flex bg-white h-2/3 aspect-square rounded-3xl
                 border-b-2 border-r-2 border-gray-200 flex-col items-center shadow-md">
                     {pageNumber === 1 ? (
