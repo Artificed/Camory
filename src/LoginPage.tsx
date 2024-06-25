@@ -1,18 +1,12 @@
-import { useEffect, useState } from 'react'; // Import useState hook
+import { useState } from 'react'; // Import useState hook
 import { invoke } from "@tauri-apps/api";
 import { useNavigate } from "react-router-dom";
 import Button from './components/Button';
 import Loading from './components/Loading';
 import WarningMessage from './components/WarningMessage';
 import logo from './assets/logo.png';
-import flag_idn from './assets/icon_Indonesia.png'
-import flag_chn from './assets/icon_China.png'
-import flag_gmn from './assets/icon_Germany.png'
-import flag_kor from './assets/icon_Korea.png'
-import flag_fra from './assets/icon_France.png'
-import flag_usa from './assets/icon_UnitedStates.png'
-import flag_uk from './assets/icon_UnitedKingdom.png'
-import flag_jp from './assets/icon_Japan.png'
+import BackgroundFlag from './components/BackgroundFlag';
+import BackButton from './components/BackButton';
 
 function LoginPage() {
     const [username, setUsername] = useState("");
@@ -21,10 +15,14 @@ function LoginPage() {
     const [isLoading, setIsLoading] = useState(false); 
     const navigate = useNavigate();
 
-    const handleLogoClick = () => {
+    const navigateToLanding = () => {
         navigate('/');
     }
 
+    const navigateToRegister = () => {
+        navigate('/register')
+    }
+    
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
@@ -49,24 +47,13 @@ function LoginPage() {
 
     return (
         <div className="h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#faf6ee] to-[#ffeabf]">
-            <ul className="indonesia">
-                <img src={flag_idn} alt=""/>
-                <img src={flag_chn} alt=""/>
-                <img src={flag_gmn} alt=""/>
-                <img src={flag_kor} alt=""/>
-                <img src={flag_jp} alt=""/>
-                <img src={flag_fra} alt=""/>
-                <img src={flag_usa} alt=""/>
-                <img src={flag_uk} alt=""/>
-                <img src={flag_idn} alt=""/>
-                <img src={flag_uk} alt=""/>
-            </ul>
+            <BackgroundFlag />
 
-            <img src={logo} className='mb-4 hover:cursor-pointer z-10' onClick={handleLogoClick}/>
+            <img src={logo} className='mb-4 hover:cursor-pointer z-10' onClick={navigateToLanding}/>
 
             <form onSubmit={handleSubmit} 
-                className='bg-white w-2/5 h-fit
-                flex flex-col items-center rounded-2xl p-8 z-10'>
+                className='bg-white w-2/5 h-auto mb-4
+                flex flex-col items-center rounded-2xl p-8 pb-2 z-10'>
 
                 <p className="text-3xl mt-4 ">Login</p>
 
@@ -78,12 +65,25 @@ function LoginPage() {
 
                 {errorMessage && <WarningMessage className="mt-4" errorMessage={errorMessage}></WarningMessage>}
 
-                {!isLoading && <Button text="Register" className="bright-red mt-12 mb-12 text-red-800 hover:bg-[#edaa92]"/>}
+                {!isLoading && <Button text="Login" className="bright-red mt-8 mb-4 text-red-800 hover:bg-[#edaa92]"/>}
 
                 {isLoading && 
-                <Loading className="mt-12 mb-12 text-red-800"></Loading>}
+                <Loading className="mt-12 mb-4 text-red-800"></Loading>}
+
+                <div className="flex flex-row gap-x-1 mb-8 text-sm">
+                    Doesn't have an account yet?
+                    <a 
+                    className="text-blue-500 hover:text-blue-700 underline hover:no-underline font-medium cursor-pointer" 
+                    onClick={navigateToRegister}>
+                        Register here
+                    </a>
+                </div>
 
             </form>
+
+            <BackButton 
+            className='z-50 flex mt-0 items-start justify-left w-1/2 px-5 py-2 text-sm text-gray-700 transition-colors duration-200 bg-white border rounded-lg gap-x-2 sm:w-auto dark:hover:bg-gray-800 dark:bg-gray-900 hover:bg-gray-100 dark:text-gray-200 dark:border-gray-700'
+            onclick={navigateToLanding} />
         </div>
     );
 }
